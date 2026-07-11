@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a73e8" />
+  <meta name="description" content="日本の航空会社のセール・イベント情報をまとめてチェック。" />
+  <title>航空セール情報</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="icons/icon.svg" alt="" class="brand-logo" />
+        <div class="brand-text">
+          <h1>航空セール情報</h1>
+          <p class="brand-sub">航空会社のセール&イベントまとめ</p>
+        </div>
+      </div>
+      <button id="notifyBtn" class="notify-btn" type="button" title="新着通知を受け取る">
+        <span class="bell">🔔</span><span class="notify-label">通知</span>
+      </button>
+    </div>
+
+    <div class="search-row">
+      <input id="searchInput" class="search-input" type="search"
+             placeholder="キーワード検索(航空会社・路線・タイトル)" autocomplete="off" />
+    </div>
+
+    <div class="toolbar">
+      <div class="chips" id="categoryChips" role="tablist" aria-label="種別">
+        <button class="chip is-active" data-type="all">すべて</button>
+        <button class="chip" data-type="セール">セール</button>
+        <button class="chip" data-type="キャンペーン">キャンペーン</button>
+        <button class="chip" data-type="イベント">イベント</button>
+      </div>
+      <div class="controls">
+        <label class="fav-toggle">
+          <input type="checkbox" id="favOnly" />
+          <span>お気に入りのみ</span>
+        </label>
+        <label class="fav-toggle">
+          <input type="checkbox" id="hideExpired" checked />
+          <span>終了を隠す</span>
+        </label>
+        <select id="sortSelect" class="sort-select" aria-label="並び替え">
+          <option value="new">新着順</option>
+          <option value="deadline">締切が近い順</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="airline-filter" id="airlineFilter" aria-label="航空会社で絞り込み"></div>
+  </header>
+
+  <main class="app-main">
+    <div id="statusBar" class="status-bar" hidden></div>
+    <div id="cardList" class="card-list" aria-live="polite"></div>
+    <div id="emptyState" class="empty-state" hidden>
+      <p>条件に合う情報が見つかりませんでした。</p>
+      <button id="resetFilters" class="link-btn" type="button">絞り込みをリセット</button>
+    </div>
+    <p class="data-note" id="dataNote"></p>
+  </main>
+
+  <!-- 詳細モーダル -->
+  <div id="detailModal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" type="button" data-close aria-label="閉じる">×</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="js/notifications.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

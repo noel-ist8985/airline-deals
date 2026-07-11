@@ -1,0 +1,614 @@
+{
+  "updatedAt": "2026-07-11T14:27:51.295840+09:00",
+  "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
+  "sales": [
+    {
+      "id": "peach-2026-summer-timesale",
+      "airline": "Peach",
+      "type": "セール",
+      "title": "夏の全路線タイムセール",
+      "summary": "国内線が片道1,000円台〜。対象28路線。3日間限定の一斉セール。",
+      "url": "https://www.flypeach.com/jp/sale",
+      "priceFrom": 1290,
+      "currency": "JPY",
+      "routes": [
+        "成田-札幌",
+        "関西-那覇",
+        "関西-福岡"
+      ],
+      "saleStart": "2026-07-14T12:00:00+09:00",
+      "saleEnd": "2026-07-16T23:59:00+09:00",
+      "travelPeriod": "2026-09-01〜2026-12-20",
+      "postedAt": "2026-07-11T08:00:00+09:00",
+      "tags": [
+        "国内線",
+        "タイムセール"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "zipair-2026-hawaii",
+      "airline": "ZIPAIR",
+      "type": "セール",
+      "title": "成田=ホノルル 就航記念セール",
+      "summary": "片道USD 200台〜。数量限定の記念運賃。",
+      "url": "https://www.zipair.net/ja/deals",
+      "priceFrom": 29800,
+      "currency": "JPY",
+      "routes": [
+        "成田-ホノルル"
+      ],
+      "saleStart": "2026-07-11T10:00:00+09:00",
+      "saleEnd": "2026-07-25T23:59:00+09:00",
+      "travelPeriod": "2026-10-01〜2027-03-25",
+      "postedAt": "2026-07-11T07:30:00+09:00",
+      "tags": [
+        "国際線",
+        "記念セール"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "spring-2026-china",
+      "airline": "Spring Japan",
+      "type": "セール",
+      "title": "成田=上海 応援セール",
+      "summary": "国際線が片道4,000円台〜。web限定運賃。",
+      "url": "https://jp.ch.com/",
+      "priceFrom": 4400,
+      "currency": "JPY",
+      "routes": [
+        "成田-上海",
+        "成田-天津"
+      ],
+      "saleStart": "2026-07-11T00:00:00+09:00",
+      "saleEnd": "2026-07-14T23:59:00+09:00",
+      "travelPeriod": "2026-09-01〜2026-12-15",
+      "postedAt": "2026-07-11T06:00:00+09:00",
+      "tags": [
+        "国際線",
+        "web限定"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "starflyer-2026-night",
+      "airline": "StarFlyer",
+      "type": "セール",
+      "title": "スターナイトセール",
+      "summary": "羽田〜北九州・福岡の深夜便がお得に。",
+      "url": "https://www.starflyer.jp/",
+      "priceFrom": 6600,
+      "currency": "JPY",
+      "routes": [
+        "羽田-北九州",
+        "羽田-福岡"
+      ],
+      "saleStart": "2026-07-11T20:00:00+09:00",
+      "saleEnd": "2026-07-15T23:59:00+09:00",
+      "travelPeriod": "2026-08-01〜2026-09-30",
+      "postedAt": "2026-07-11T05:00:00+09:00",
+      "tags": [
+        "国内線",
+        "深夜便"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "jetstar-2026-friday",
+      "airline": "Jetstar Japan",
+      "type": "セール",
+      "title": "毎週恒例フライデーセール",
+      "summary": "毎週金曜18時スタート。国内・国際線あわせて最大30％オフ。",
+      "url": "https://www.jetstar.com/jp/ja/deals",
+      "priceFrom": 1990,
+      "currency": "JPY",
+      "routes": [
+        "成田-福岡",
+        "中部-那覇"
+      ],
+      "saleStart": "2026-07-10T18:00:00+09:00",
+      "saleEnd": "2026-07-13T23:59:00+09:00",
+      "travelPeriod": "2026-08-01〜2026-10-31",
+      "postedAt": "2026-07-10T18:00:00+09:00",
+      "tags": [
+        "国内線",
+        "国際線",
+        "毎週"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "solaseed-2026-kyushu",
+      "airline": "Solaseed Air",
+      "type": "セール",
+      "title": "九州めぐりセール",
+      "summary": "羽田〜九州各地が特別運賃。数量限定。",
+      "url": "https://www.solaseedair.jp/",
+      "priceFrom": 8300,
+      "currency": "JPY",
+      "routes": [
+        "羽田-宮崎",
+        "羽田-熊本",
+        "羽田-鹿児島"
+      ],
+      "saleStart": "2026-07-13T10:00:00+09:00",
+      "saleEnd": "2026-07-20T23:59:00+09:00",
+      "travelPeriod": "2026-08-15〜2026-10-15",
+      "postedAt": "2026-07-10T15:00:00+09:00",
+      "tags": [
+        "国内線",
+        "九州"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "skymark-2026-anniversary",
+      "airline": "Skymark",
+      "type": "セール",
+      "title": "就航記念 期間限定運賃",
+      "summary": "対象路線が片道3,000円台から。座席数限定。",
+      "url": "https://www.skymark.co.jp/ja/",
+      "priceFrom": 3800,
+      "currency": "JPY",
+      "routes": [
+        "羽田-神戸",
+        "神戸-那覇",
+        "羽田-鹿児島"
+      ],
+      "saleStart": "2026-07-12T09:00:00+09:00",
+      "saleEnd": "2026-07-19T23:59:00+09:00",
+      "travelPeriod": "2026-08-01〜2026-09-30",
+      "postedAt": "2026-07-10T12:00:00+09:00",
+      "tags": [
+        "国内線",
+        "記念セール"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "ana-2026-event-mile",
+      "airline": "ANA",
+      "type": "イベント",
+      "title": "マイルが当たるオンライン抽選会",
+      "summary": "期間中エントリーで抽選。最大10,000マイルが当たるキャンペーン。",
+      "url": "https://www.ana.co.jp/ja/jp/",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "2026-07-15T00:00:00+09:00",
+      "saleEnd": "2026-08-15T23:59:00+09:00",
+      "travelPeriod": "",
+      "postedAt": "2026-07-10T09:00:00+09:00",
+      "tags": [
+        "イベント",
+        "マイル",
+        "抽選"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "peach-2026-event-matsuri",
+      "airline": "Peach",
+      "type": "イベント",
+      "title": "空港フェス出展 & 限定クーポン配布",
+      "summary": "関西空港のイベントブースで、その場で使えるアプリ限定クーポンを配布。",
+      "url": "https://www.flypeach.com/jp",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "2026-07-19T10:00:00+09:00",
+      "saleEnd": "2026-07-20T17:00:00+09:00",
+      "travelPeriod": "",
+      "postedAt": "2026-07-09T12:00:00+09:00",
+      "tags": [
+        "イベント",
+        "クーポン"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "jal-2026-dynamic",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "JAL 先得 秋の予約開始",
+      "summary": "秋〜冬の国内線先得運賃を受付開始。マイル積算対象。",
+      "url": "https://www.jal.co.jp/jp/ja/dom/",
+      "priceFrom": 8800,
+      "currency": "JPY",
+      "routes": [
+        "羽田-出雲",
+        "羽田-那覇",
+        "伊丹-新千歳"
+      ],
+      "saleStart": "2026-07-09T00:00:00+09:00",
+      "saleEnd": "2026-09-30T23:59:00+09:00",
+      "travelPeriod": "2026-10-01〜2026-12-25",
+      "postedAt": "2026-07-09T09:00:00+09:00",
+      "tags": [
+        "国内線",
+        "早期予約",
+        "マイル"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "auto-c4857c067b",
+      "airline": "JAL",
+      "type": "イベント",
+      "title": "国内線「JAL ハッピードリームキャンペーン 2026」を実施",
+      "summary": "JALは、2026年7月17(金)日～9月30日(水)の対象期間中にJALグループ国内線に2回ご搭乗いただくことで、素敵な賞品が抽選で当たる「JAL ハッピードリームキャンペーン 2026」を実施します。 賞品...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001527.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-07-08T10:50:02+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "ana-2026-tabiwari",
+      "airline": "ANA",
+      "type": "キャンペーン",
+      "title": "ANA スーパーバリューセール",
+      "summary": "国内線先得。早期予約で最大75日前まで割引運賃。",
+      "url": "https://www.ana.co.jp/ja/jp/domestic/",
+      "priceFrom": 7700,
+      "currency": "JPY",
+      "routes": [
+        "羽田-伊丹",
+        "羽田-福岡",
+        "羽田-新千歳"
+      ],
+      "saleStart": "2026-07-08T00:00:00+09:00",
+      "saleEnd": "2026-08-20T23:59:00+09:00",
+      "travelPeriod": "2026-09-01〜2026-11-30",
+      "postedAt": "2026-07-08T10:00:00+09:00",
+      "tags": [
+        "国内線",
+        "早期予約"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "auto-64e3b7186b",
+      "airline": "Jetstar Japan",
+      "type": "キャンペーン",
+      "title": "ジェットスター・ジャパン創業15周年 第一弾はフライトバウチャー15万円相当が当たるSNS キャンペーン開催",
+      "summary": "ジェットスター・ジャパン株式会社（本社：千葉県成田市、代表取締役社長：田中正和、以下：ジェットスター）は、2026年度に創業15周年を迎えます。皆さまへの感謝を込めて、創業15周年を記念したさまざまな企画...",
+      "url": "https://prtimes.jp/main/html/rd/p/000000218.000012437.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-07-06T13:15:14+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "airdo-2026-hokkaido",
+      "airline": "AIRDO",
+      "type": "キャンペーン",
+      "title": "北海道スペシャル運賃",
+      "summary": "本州各地〜北海道が割引に。道民割の設定あり。",
+      "url": "https://www.airdo.jp/",
+      "priceFrom": 9800,
+      "currency": "JPY",
+      "routes": [
+        "羽田-新千歳",
+        "羽田-旭川",
+        "中部-新千歳"
+      ],
+      "saleStart": "2026-07-05T00:00:00+09:00",
+      "saleEnd": "2026-07-31T23:59:00+09:00",
+      "travelPeriod": "2026-08-01〜2026-10-31",
+      "postedAt": "2026-07-05T10:00:00+09:00",
+      "tags": [
+        "国内線",
+        "北海道"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "jetstar-2026-expired",
+      "airline": "Jetstar Japan",
+      "type": "セール",
+      "title": "七夕スペシャルセール(終了)",
+      "summary": "終了済みセールの表示例。締切を過ぎた項目は淡色で表示されます。",
+      "url": "https://www.jetstar.com/jp/ja/deals",
+      "priceFrom": 2500,
+      "currency": "JPY",
+      "routes": [
+        "成田-那覇"
+      ],
+      "saleStart": "2026-07-01T00:00:00+09:00",
+      "saleEnd": "2026-07-07T23:59:00+09:00",
+      "travelPeriod": "2026-08-01〜2026-09-30",
+      "postedAt": "2026-07-01T10:00:00+09:00",
+      "tags": [
+        "国内線",
+        "終了"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "fda-2026-regional",
+      "airline": "Fuji Dream",
+      "type": "キャンペーン",
+      "title": "FDA 地方路線お試し運賃",
+      "summary": "名古屋(小牧)・静岡発の地方路線が割引。",
+      "url": "https://www.fujidream.co.jp/",
+      "priceFrom": 7000,
+      "currency": "JPY",
+      "routes": [
+        "名古屋-出雲",
+        "静岡-福岡"
+      ],
+      "saleStart": "2026-07-01T00:00:00+09:00",
+      "saleEnd": "2026-07-31T23:59:00+09:00",
+      "travelPeriod": "2026-08-01〜2026-10-31",
+      "postedAt": "2026-07-01T09:00:00+09:00",
+      "tags": [
+        "国内線",
+        "地方路線"
+      ],
+      "source": "manual"
+    },
+    {
+      "id": "auto-302ed2abee",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "JAL、パスポート申請費用の引き下げに合わせた「もっと！海外へ」連携キャンペーンを実施",
+      "summary": "JALグループは、「移動を通じた関係・つながり」の拡大に向けて、国内間だけでなく、海外と日本とを...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001524.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-06-29T15:40:01+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-b71465e6de",
+      "airline": "JAL",
+      "type": "イベント",
+      "title": "【青森・北海道・大阪】（共同リリース）青森=大阪(伊丹)、札幌(新千歳)線就航50周年セレモニー記念イベントを開催",
+      "summary": "(共同リリース） 2026年6月2５日 日本航空株式会社 株式会社ジェイエア 2026年7月1日（水）で、JALグループは青森＝大阪（伊丹）線・札幌（新千歳）線の就航５0周年を迎えます。記念日となる7月1日（水）には..…",
+      "url": "https://prtimes.jp/main/html/rd/p/000001521.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-06-25T14:04:07+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-48ab54ffa7",
+      "airline": "JAL",
+      "type": "イベント",
+      "title": "【新潟・大阪】（共同リリース）新潟=大阪(伊丹）線 就航60周年記念イベントを開催",
+      "summary": "(共同リリース） 2026年6月25日 日本航空株式会社 株式会社ジェイエア 2026年7月1日（水）で、JALグループは新潟＝大阪（伊丹）線の就航60周年を迎えます。記念日となる7月1日（水）には、新潟空港および大阪.…",
+      "url": "https://prtimes.jp/main/html/rd/p/000001520.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-06-25T12:06:10+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-ab60849128",
+      "airline": "Peach",
+      "type": "キャンペーン",
+      "title": "東京（成田）- ソウル（仁川）線を開設！7 年ぶりの成田空港発着 国際線就航",
+      "summary": "Peach Aviation 株式会社（以下: Peach、代表取締役 CEO: 大橋 一成）は、9 月 20 日（日）から 東京（成田）- ソウル（仁川）線を開設することを発表しました。本日 16:00 より、航空券の…",
+      "url": "https://prtimes.jp/main/html/rd/p/000000040.000081560.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-05-14T16:00:02+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-e286cb8e80",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "(共同リリース)東京ディズニーシー(R) 25 周年をテーマにした特別塗装機「JAL Jubilee Express」が 6 月 4 日(木)より国内線に就航",
+      "summary": "202 6 年 4 月 16 日 日 本 航 空 株 式 会 社 株式会社オリエンタルランド 日本航空株式会社(本社:東京都品川区、...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001470.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-04-16T16:30:01+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-fd50ed94fc",
+      "airline": "Peach",
+      "type": "セール",
+      "title": "Peach、創業15年を機にブランドリニューアルを実施",
+      "summary": "Peach Aviation株式会社 Peach、創業15年を機にブランドリニューアルを実施 デザインパートナーに世界的なデザインオフィスnendoを起用 ～27年春には新デザインの機材を導入～ Peach Avia..…",
+      "url": "https://prtimes.jp/main/html/rd/p/000000037.000081560.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-03-31T18:05:59+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-6051c84b72",
+      "airline": "Jetstar Japan",
+      "type": "セール",
+      "title": "イースターエッグに見立てた「0」が並ぶ「ハッピーイースターセール」開催 ～国内路線片道3,000円*から、アジア路線片道8,000円*から～",
+      "summary": "4月5日（日）の「イースター」に合わせて、「ハッピーイースターセール」を開催 [ 2026年4月2日（木）12:00～4月8日（水）16:59 ] イースターエッグに見立てた「0」を並べ、国内15路線対象で片道3,000…",
+      "url": "https://prtimes.jp/main/html/rd/p/000000217.000012437.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-03-26T13:00:02+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-802edd33ca",
+      "airline": "Peach",
+      "type": "セール",
+      "title": "おかげさまで創業15周年！心からの感謝を込めて全路線が対象の「感謝セール」を開催",
+      "summary": "Peach Aviation株式会社（以下：Peach、代表取締役CEO：大橋 一成）は、2026年2月10日に創業15周年を迎えました。これまで支えてくださったすべてのお客さま、関係者のみなさまに心からの感謝を込めて、…",
+      "url": "https://prtimes.jp/main/html/rd/p/000000035.000081560.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-03-03T14:30:01+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-0ec34dc0e6",
+      "airline": "JAL",
+      "type": "イベント",
+      "title": "3月2日は「サフ（SAF）の日」 廃食油の持参で「32（サフ）マイル」をプレゼント",
+      "summary": "3月2日は「サフ（SAF）の日」 JALグループは、2009年にアジアで初めてSAF(Sustainable Aviation Fuel...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001443.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-03-03T12:57:49+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-7c5f1b710b",
+      "airline": "Jetstar Japan",
+      "type": "セール",
+      "title": "縁起の良い「7」が並ぶ「最強開運日セール」～国内全路線片道777円*から、アジア全路線7,777円*から～",
+      "summary": "3月5日（木）は「一粒万倍日」「天赦日」「寅の日」「大安」の四つの吉日が重なる、2026年における最強開運日のひとつ 国内全路線対象で片道777円*～、アジア全路線対象で片道7,777円*～となる「最強開運日セー...",
+      "url": "https://prtimes.jp/main/html/rd/p/000000216.000012437.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-02-26T13:00:02+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-d89141b9bf",
+      "airline": "Peach",
+      "type": "セール",
+      "title": "4月～7月搭乗分「弾丸往復運賃」が登場！スキマ時間でリフレッシュ旅へ！",
+      "summary": "・ 国際線6路線、国内線17路線が対象 ・ 国際線は往復9,000円～、国内線は往復7,000円～ ・ 販売期間：2026年2月25日12:00～202...",
+      "url": "https://prtimes.jp/main/html/rd/p/000000034.000081560.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-02-25T12:02:29+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-438ea6887f",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "（共同リリース）イマーシブシアター「そらクルーズ」を大阪港バーティポートに開設",
+      "summary": "日本航空株式会社 住友商事株式会社 株式会社Soracle 大阪市高速電気軌道株式会社 日本航空株式会...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001431.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-02-13T13:30:01+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
+    {
+      "id": "auto-81363eb858",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "(共同リリース)「JALのマイルが毎日、たくさん、早く、たまるトラリピプログラム」開始",
+      "summary": "株式会社マネースクエア 日本航空株式会社 [画像2: https://prtimes.jp/i/30684/1422/resize/d30684-...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001422.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-01-29T17:00:02+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    }
+  ]
+}

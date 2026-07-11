@@ -1,0 +1,17 @@
+{
+  "_readme": "各航空会社の PR TIMES 企業別RSS。company_id は https://prtimes.jp/main/html/searchrlp/company_id/【ID】 の数字部分です。新しい社を追加するには prtimes.jp で会社名を検索し、企業ページURL末尾の数字を company_id= の後ろに入れて enabled を true にしてください。airline はアプリの色設定に対応(js/app.js の AIRLINES 参照)。",
+  "sources": [
+    { "airline": "JAL",           "url": "https://prtimes.jp/companyrdf.php?company_id=30684", "enabled": true },
+    { "airline": "Jetstar Japan", "url": "https://prtimes.jp/companyrdf.php?company_id=12437", "enabled": true },
+    { "airline": "Peach",         "url": "https://prtimes.jp/companyrdf.php?company_id=81560", "enabled": true },
+
+    { "airline": "ANA",          "url": "https://prtimes.jp/companyrdf.php?company_id=0", "enabled": false, "hint": "ANAは主に自社サイト(https://www.ana.co.jp/group/pr/)で配信。PR TIMES企業IDが見つかれば設定してtrueに。" },
+    { "airline": "ZIPAIR",       "url": "https://prtimes.jp/companyrdf.php?company_id=0", "enabled": false, "hint": "prtimes.jp で『ZIPAIR』を検索して company_id を設定。" },
+    { "airline": "Spring Japan", "url": "https://prtimes.jp/companyrdf.php?company_id=0", "enabled": false, "hint": "prtimes.jp で『スプリング・ジャパン』を検索して company_id を設定。" },
+    { "airline": "Skymark",      "url": "https://prtimes.jp/companyrdf.php?company_id=0", "enabled": false, "hint": "スカイマークは自社サイト(https://www.skymark.co.jp/ja/company/press/)中心。IDが見つかれば設定。" },
+    { "airline": "Solaseed Air", "url": "https://prtimes.jp/companyrdf.php?company_id=0", "enabled": false, "hint": "prtimes.jp で『ソラシドエア』を検索して company_id を設定。" },
+    { "airline": "StarFlyer",    "url": "https://prtimes.jp/companyrdf.php?company_id=0", "enabled": false, "hint": "prtimes.jp で『スターフライヤー』を検索して company_id を設定。" },
+    { "airline": "AIRDO",        "url": "https://prtimes.jp/companyrdf.php?company_id=0", "enabled": false, "hint": "prtimes.jp で『AIRDO』を検索して company_id を設定。" },
+    { "airline": "Fuji Dream",   "url": "https://prtimes.jp/companyrdf.php?company_id=0", "enabled": false, "hint": "prtimes.jp で『フジドリームエアラインズ』を検索して company_id を設定。" }
+  ]
+}
