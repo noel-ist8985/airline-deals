@@ -1,5 +1,5 @@
 /* Service Worker — オフラインキャッシュ & 通知クリック処理 */
-const CACHE = 'airline-deals-v2';
+const CACHE = 'airline-deals-v3';
 const ASSETS = [
   './',
   './index.html',
