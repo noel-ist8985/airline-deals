@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-07-15T15:30:33.592719+09:00",
+  "updatedAt": "2026-07-16T00:13:25.818059+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
+    {
+      "id": "auto-c168281586",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "（共同リリース）JALと東京電力EP、ライフラインでマイルがたまる「JALガス」提供開始",
+      "summary": "日本航空株式会社 東京電力エナジーパートナー株式会社 [画像2: https://prtimes.jp/i/30684/1529/res...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001529.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-07-15T15:40:01+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
     {
       "id": "peach-2026-summer-timesale",
       "airline": "Peach",
@@ -586,25 +605,6 @@
       "saleEnd": "",
       "travelPeriod": "",
       "postedAt": "2026-02-13T13:30:01+09:00",
-      "tags": [
-        "自動取得"
-      ],
-      "source": "PR TIMES"
-    },
-    {
-      "id": "auto-81363eb858",
-      "airline": "JAL",
-      "type": "キャンペーン",
-      "title": "(共同リリース)「JALのマイルが毎日、たくさん、早く、たまるトラリピプログラム」開始",
-      "summary": "株式会社マネースクエア 日本航空株式会社 [画像2: https://prtimes.jp/i/30684/1422/resize/d30684-...",
-      "url": "https://prtimes.jp/main/html/rd/p/000001422.000030684.html",
-      "priceFrom": null,
-      "currency": "JPY",
-      "routes": [],
-      "saleStart": "",
-      "saleEnd": "",
-      "travelPeriod": "",
-      "postedAt": "2026-01-29T17:00:02+09:00",
       "tags": [
         "自動取得"
       ],
