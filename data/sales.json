@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-08-02T23:47:30.846310+09:00",
+  "updatedAt": "2026-08-03T19:56:16.618823+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
+    {
+      "id": "auto-78a4835f82",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "JALグループ 2027年3月期 第1四半期連結業績",
+      "summary": "JALグループは、本日2027年3月期 第1四半期連結業績(2026年4月1日～2026年6月30日)につ いて取りまとめました。 ● 売上収益は、航空事業、マイル/金融・コマース事業ともに前年を上回り、 5,237..…",
+      "url": "https://prtimes.jp/main/html/rd/p/000001542.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-08-03T17:00:02+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
     {
       "id": "auto-c168281586",
       "airline": "JAL",
@@ -586,25 +605,6 @@
       "saleEnd": "",
       "travelPeriod": "",
       "postedAt": "2026-02-25T12:02:29+09:00",
-      "tags": [
-        "自動取得"
-      ],
-      "source": "PR TIMES"
-    },
-    {
-      "id": "auto-438ea6887f",
-      "airline": "JAL",
-      "type": "キャンペーン",
-      "title": "（共同リリース）イマーシブシアター「そらクルーズ」を大阪港バーティポートに開設",
-      "summary": "日本航空株式会社 住友商事株式会社 株式会社Soracle 大阪市高速電気軌道株式会社 日本航空株式会...",
-      "url": "https://prtimes.jp/main/html/rd/p/000001431.000030684.html",
-      "priceFrom": null,
-      "currency": "JPY",
-      "routes": [],
-      "saleStart": "",
-      "saleEnd": "",
-      "travelPeriod": "",
-      "postedAt": "2026-02-13T13:30:01+09:00",
       "tags": [
         "自動取得"
       ],
