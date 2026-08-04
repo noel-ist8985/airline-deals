@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>掃除当番</title>
+<style>
+  :root{
+    --ink:#14213d; --ink-soft:#4a5a75; --muted:#8d9aad;
+    --paper:#e9edf1; --card:#ffffff; --line:#ccd6e0;
+    --blue:#5b93b8; --blue-fill:#cfe2ee;
+    --gomi:#a9662a; --gomi-fill:#f2e3d2;
+    --fix:#4e7a63; --fix-fill:#dfeae3;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+    --gothic:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--gothic);
+       -webkit-font-smoothing:antialiased;line-height:1.7}
+  .wrap{max-width:640px;margin:0 auto;padding:28px 18px 72px}
+
+  header.top{margin-bottom:22px}
+  .eyebrow{font-size:11px;letter-spacing:.32em;color:var(--muted);margin:0 0 6px}
+  h1{font-family:var(--mincho);font-size:34px;letter-spacing:.14em;font-weight:600;margin:0}
+  .sub{font-size:12.5px;color:var(--ink-soft);margin-top:6px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:3px;
+        padding:20px 18px;margin-bottom:16px}
+  .card h2{font-family:var(--mincho);font-size:15px;letter-spacing:.16em;font-weight:600;
+           margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid var(--line);
+           display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .card h2 .meta{font-family:var(--gothic);font-size:11px;letter-spacing:.04em;
+                 color:var(--muted);font-weight:400}
+
+  .who{display:flex;flex-wrap:wrap;gap:7px}
+  .who button{font-family:var(--gothic);font-size:14px;padding:7px 14px;
+              border:1px solid var(--line);background:#fff;color:var(--ink-soft);
+              border-radius:999px;cursor:pointer;transition:.15s}
+  .who button:hover{border-color:var(--blue)}
+  .who button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .who button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .who .divider{width:100%;height:0;margin:2px 0}
+  .who .fixlabel{font-size:10.5px;letter-spacing:.16em;color:var(--fix);
+                 width:100%;margin:8px 0 -2px}
+
+  .hero{background:var(--ink);color:#fff;border:none;padding:0;overflow:hidden}
+  .hero-inner{padding:22px 18px 6px}
+  .hero .status{font-size:11px;letter-spacing:.3em;color:#93a8c4;margin:0 0 10px}
+  .hero .place{font-family:var(--mincho);font-size:40px;letter-spacing:.1em;margin:0;line-height:1.25}
+  .hero .place small{font-size:15px;letter-spacing:.16em;color:#a8bcd6;display:block;
+                     margin-top:8px;font-family:var(--gothic)}
+  .hero .when{font-size:13.5px;color:#c6d6e8;margin:14px 0 0}
+  .hero .count{font-size:13.5px;color:#fff;margin:4px 0 0}
+  .hero .count b{font-family:var(--mincho);font-size:30px;letter-spacing:.04em;margin:0 3px}
+  .hero .badge{display:inline-block;margin-top:12px;font-size:12px;padding:3px 10px;
+               border-radius:2px;letter-spacing:.06em}
+  .hero .badge.gomi{background:#3a4e70;color:#ffd9ac}
+  .hero .badge.fix{background:#2f4a3d;color:#bfe0cd}
+  .hero .pad{padding-bottom:22px}
+
+  .ring{display:block;margin:0 auto;max-width:100%}
+  .ring text{font-family:var(--gothic)}
+
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:9px 8px;border-bottom:1px solid #eef1f4;vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  td.place{font-family:var(--mincho);letter-spacing:.1em;width:38%;color:var(--ink)}
+  td.name{font-size:16px}
+  tr.mine td{background:var(--blue-fill)}
+  tr.mine td.name{font-weight:700}
+  tr.fixedrow td.place{color:var(--fix)}
+  .tag{display:inline-block;font-size:10.5px;letter-spacing:.08em;padding:1px 7px;
+       border-radius:2px;margin-left:7px;vertical-align:1px}
+  .tag.gomi{background:var(--gomi-fill);color:var(--gomi)}
+  .tag.fix{background:var(--fix-fill);color:var(--fix)}
+  .vacant{color:var(--muted);font-size:13px}
+
+  .future{list-style:none;margin:0;padding:0}
+  .future li{display:flex;gap:14px;align-items:baseline;padding:11px 0;
+             border-bottom:1px solid #eef1f4;font-size:14.5px}
+  .future li:last-child{border-bottom:none}
+  .future .date{color:var(--ink-soft);font-size:13px;min-width:112px;font-variant-numeric:tabular-nums}
+  .future .p{font-family:var(--mincho);letter-spacing:.08em}
+  .future li.mine .p{color:var(--blue);font-weight:600}
+
+  .printbtn{font-family:var(--gothic);font-size:11px;letter-spacing:.1em;
+            border:1px solid var(--line);background:#fff;color:var(--ink-soft);
+            padding:4px 11px;border-radius:2px;cursor:pointer}
+  .printbtn:hover{border-color:var(--blue);color:var(--blue)}
+  .year-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table.year{font-size:13px;min-width:520px}
+  table.year th{font-family:var(--gothic);font-weight:500;font-size:11.5px;color:var(--ink-soft);
+                padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+  table.year th.rowhead{text-align:left}
+  table.year td{padding:7px 6px;text-align:center;border-bottom:1px solid #eef1f4;white-space:nowrap}
+  table.year td.rowhead{font-family:var(--mincho);letter-spacing:.08em;text-align:left;color:var(--ink)}
+  table.year tr.fixedrow td.rowhead{color:var(--fix)}
+  table.year col.now{background:var(--blue-fill)}
+  table.year td.me{font-weight:700}
+
+  details.settings summary{cursor:pointer;font-size:13px;letter-spacing:.12em;
+                           color:var(--ink-soft);list-style:none;padding:4px 0}
+  details.settings summary::-webkit-details-marker{display:none}
+  details.settings summary::before{content:"設定 ／ ";color:var(--muted)}
+  .setgrid{margin-top:16px}
+  .setrow{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+  .setrow input[type=text]{flex:1;font-family:var(--gothic);font-size:14px;padding:6px 9px;
+    border:1px solid var(--line);border-radius:2px;background:#fbfcfd;color:var(--ink);min-width:0}
+  .setrow label.chk{font-size:11.5px;color:var(--gomi);display:flex;align-items:center;
+                    gap:3px;white-space:nowrap}
+  .mini{border:1px solid var(--line);background:#fff;color:var(--ink-soft);
+        width:28px;height:28px;border-radius:2px;cursor:pointer;font-size:13px;line-height:1;flex:none}
+  .mini:hover{border-color:var(--blue);color:var(--blue)}
+  .add{margin-top:8px;font-family:var(--gothic);font-size:12.5px;letter-spacing:.08em;
+       background:none;border:1px dashed var(--line);color:var(--ink-soft);
+       padding:7px 12px;border-radius:2px;cursor:pointer;width:100%}
+  .add:hover{border-color:var(--blue);color:var(--blue)}
+  .fieldlabel{font-size:11px;letter-spacing:.2em;color:var(--muted);margin:20px 0 8px}
+  .fieldlabel:first-child{margin-top:0}
+  .hint{font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0 0}
+  input[type=date],input[type=number]{font-family:var(--gothic);font-size:14px;padding:6px 9px;
+    border:1px solid var(--line);border-radius:2px;background:#fbfcfd;color:var(--ink)}
+  .save{margin-top:20px;width:100%;background:var(--ink);color:#fff;border:none;padding:12px;
+        border-radius:2px;font-family:var(--gothic);font-size:14px;letter-spacing:.16em;cursor:pointer}
+  .save:hover{background:#233458}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:var(--ink);
+         color:#fff;padding:10px 20px;border-radius:2px;font-size:13px;opacity:0;
+         pointer-events:none;transition:opacity .25s;letter-spacing:.08em}
+  .toast.show{opacity:1}
+  footer{text-align:center;font-size:11px;color:var(--muted);letter-spacing:.1em;margin-top:26px}
+
+  @media print{
+    @page{size:A4 landscape;margin:12mm}
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    header.top,.card,footer{display:none!important}
+    #yearCard{display:block!important;border:none;padding:0;margin:0}
+    #yearCard h2{font-size:18px;border-bottom:2px solid var(--ink);letter-spacing:.2em}
+    #yearCard .printbtn{display:none}
+    .year-scroll{overflow:visible}
+    table.year{min-width:0;width:100%;font-size:12px}
+    table.year th,table.year td{border:1px solid #999;padding:8px 4px}
+    table.year col.now{background:#e8eff5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <p class="eyebrow">ROTATION</p>
+    <h1>掃除当番</h1>
+    <p class="sub">当番は月曜から金曜までの5日間。6週に1回まわってきて、担当場所はひとつずつ後ろへずれていきます。</p>
+  </header>
+
+  <div class="card">
+    <h2>自分をえらぶ</h2>
+    <div class="who" id="who"></div>
+  </div>
+
+  <div class="card hero" id="hero" hidden>
+    <div class="hero-inner" id="heroInner"></div>
+    <svg class="ring" id="ring" viewBox="0 0 330 300" role="img" aria-label="担当場所のローテーション図"></svg>
+  </div>
+
+  <div class="card">
+    <h2>今回の当番<span class="meta" id="curRange"></span></h2>
+    <table><tbody id="curTable"></tbody></table>
+    <p class="hint">事務所掃除の人がすべてのごみ収集も担当</p>
+  </div>
+
+  <div class="card">
+    <h2>このあと<span class="meta" id="futureFor"></span></h2>
+    <ul class="future" id="future"></ul>
+  </div>
+
+  <div class="card" id="yearCard">
+    <h2>年間当番表<span class="meta"><button class="printbtn" id="printBtn">A4で印刷</button></span></h2>
+    <div class="year-scroll"><table class="year" id="yearTable"></table></div>
+    <p class="hint">事務所掃除の人がすべてのごみ収集も担当</p>
+  </div>
+
+  <div class="card">
+    <details class="settings">
+      <summary>メンバー・場所・日程を編集</summary>
+      <div class="setgrid">
+        <p class="fieldlabel">まわる場所（この順にずれていきます）</p>
+        <div id="slotList"></div>
+        <button class="add" id="addSlot">＋ 場所を追加</button>
+
+        <p class="fieldlabel">まわるメンバー（基準日に上の場所を担当した順）</p>
+        <div id="memberList"></div>
+        <button class="add" id="addMember">＋ メンバーを追加</button>
+
+        <p class="fieldlabel">固定の担当（輪に入らない場所）</p>
+        <div id="fixedList"></div>
+        <button class="add" id="addFixed">＋ 固定の担当を追加</button>
+        <p class="hint">名前は「、」か「,」で区切ってください。</p>
+
+        <p class="fieldlabel">基準になる回の開始日（月曜）</p>
+        <input type="date" id="baseDate">
+        <p class="fieldlabel">まわってくる間隔</p>
+        <div class="setrow">
+          <input type="number" id="interval" min="1" max="52" style="width:80px"> <span style="font-size:14px">週ごと</span>
+        </div>
+
+        <p class="fieldlabel">お休みの週（数えない週）</p>
+        <div id="skipList"></div>
+        <button class="add" id="addSkip">＋ お休みの週を追加</button>
+        <p class="hint">お盆や年末年始など、掃除をしない週の月曜日を入れてください。その週は数に入らず、以降の当番が1週ずつ後ろにずれます。</p>
+
+        <button class="save" id="save">保存する</button>
+      </div>
+    </details>
+  </div>
+
+  <footer>2026/7/26 の当番表をもとに作成</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'souji-touban:config:v7';
+
+/* 7/27〜7/31 の並びを基準にしています */
+const DEFAULTS = {
+  slots: [
+    {place:'玄関',   gomi:false},
+    {place:'事務所', gomi:false},
+    {place:'事務所', gomi:true },
+    {place:'食堂',   gomi:false},
+    {place:'食堂',   gomi:false},
+    {place:'更衣室', gomi:false},
+    {place:'前室',   gomi:false},
+    {place:'前室',   gomi:false}
+  ],
+  members: ['松浦','川本','赤名','森田','上代','曽田','泉','川島'],
+  fixed: [],
+  baseDate: '2026-07-27',
+  intervalWeeks: 6,
+  skipWeeks: ['2026-08-10'],   // お盆休み
+  me: ''
+};
+
+let cfg = JSON.parse(JSON.stringify(DEFAULTS));
+
+/* ---------- 日付 ---------- */
+const DAY = 86400000;
+function d(str){ const [y,m,dd]=str.split('-').map(Number); return new Date(y,m-1,dd); }
+function addDays(dt,n){ const x=new Date(dt); x.setDate(x.getDate()+n); return x; }
+function iso(dt){
+  const p=n=>String(n).padStart(2,'0');
+  return dt.getFullYear()+'-'+p(dt.getMonth()+1)+'-'+p(dt.getDate());
+}
+function fmt(dt){ return (dt.getMonth()+1)+'/'+dt.getDate(); }
+function fmtLong(dt){ return (dt.getMonth()+1)+'月'+dt.getDate()+'日('+'日月火水木金土'[dt.getDay()]+')'; }
+
+/* 休みの週（月曜日）を除いた「数える週」の並び。
+   お盆や年末年始で1週飛ぶと、それ以降すべて後ろへずれます。 */
+function skipSet(){
+  const s=new Set();
+  (cfg.skipWeeks||[]).forEach(v=>{ if(v) s.add(v); });
+  return s;
+}
+function weekAt(n){                       // n番目の「数える週」の月曜日
+  const skip=skipSet();
+  let dt=d(cfg.baseDate), count=0, guard=0;
+  while(guard++ < 4000){
+    if(!skip.has(iso(dt))){
+      if(count===n) return dt;
+      count++;
+    }
+    dt=addDays(dt,7);
+  }
+  return dt;
+}
+function periodStart(p){ return weekAt(p*cfg.intervalWeeks); }
+function periodEnd(p){ return addDays(periodStart(p),4); }   // 月〜金
+function today(){ const t=new Date(); return new Date(t.getFullYear(),t.getMonth(),t.getDate()); }
+
+function currentPeriod(){
+  const t=today();
+  if(t < d(cfg.baseDate)) return 0;
+  let p=0;
+  while(p<200 && t > periodEnd(p)) p++;
+  return p;
+}
+
+/* ---------- 割り当て ---------- */
+function slotOf(m,p){
+  const N=Math.max(cfg.slots.length, cfg.members.length);
+  if(N===0) return -1;
+  const s=((m+p)%N+N)%N;
+  return s<cfg.slots.length ? s : -1;      // -1 は休み
+}
+function assignment(p){
+  const rows=cfg.slots.map(()=>null);
+  cfg.members.forEach((name,m)=>{ const s=slotOf(m,p); if(s>=0) rows[s]=name; });
+  return rows;
+}
+function slotLabel(i){
+  const s=cfg.slots[i], same=cfg.slots.filter(x=>x.place===s.place);
+  if(same.length<2) return s.place;
+  const n=cfg.slots.slice(0,i+1).filter(x=>x.place===s.place).length;
+  return s.place+'①②③④⑤'[n-1];
+}
+function myIndex(){ return cfg.members.indexOf(cfg.me); }
+function myFixed(){ return cfg.fixed.find(f=>f.names.includes(cfg.me)) || null; }
+function allNames(){
+  const f=[]; cfg.fixed.forEach(x=>x.names.forEach(n=>f.push(n)));
+  return {rotating:cfg.members.slice(), fixed:f};
+}
+
+/* ---------- 描画 ---------- */
+function render(){
+  const p=currentPeriod();
+  renderWho(); renderHero(p); renderCurrent(p); renderFuture(p); renderYear(p);
+}
+
+function renderWho(){
+  const el=document.getElementById('who'); el.innerHTML='';
+  const {rotating,fixed}=allNames();
+  const mk=name=>{
+    const b=document.createElement('button');
+    b.textContent=name;
+    b.setAttribute('aria-pressed', String(name===cfg.me));
+    b.onclick=()=>{ cfg.me=(cfg.me===name?'':name); save(true); render(); };
+    return b;
+  };
+  rotating.forEach(n=>el.appendChild(mk(n)));
+  if(fixed.length){
+    const lab=document.createElement('p'); lab.className='fixlabel'; lab.textContent='固定担当';
+    el.appendChild(lab);
+    fixed.forEach(n=>el.appendChild(mk(n)));
+  }
+}
+
+function renderHero(p){
+  const hero=document.getElementById('hero');
+  const ring=document.getElementById('ring');
+  const inner=document.getElementById('heroInner');
+  const fx=myFixed(), m=myIndex();
+
+  if(!cfg.me || (fx===null && m<0)){ hero.hidden=true; return; }
+  hero.hidden=false;
+
+  const t=today();
+
+  if(fx){                       // 固定担当の人
+    const start=periodStart(p), end=periodEnd(p);
+    const now = t>=start && t<=end;
+    const days=Math.max(0, Math.ceil((start-t)/DAY));
+    inner.className='hero-inner pad';
+    inner.innerHTML=
+      '<p class="status">'+(now?'今週が当番です':'つぎの当番')+'</p>'+
+      '<p class="place">'+fx.place+'<small>'+cfg.me+' さん（毎回このばしょ）</small></p>'+
+      '<p class="when">'+fmt(start)+'〜'+fmt(end)+'</p>'+
+      (now ? '<p class="count">'+fmtLong(start)+' 〜 '+fmtLong(end)+'</p>'
+           : '<p class="count">あと<b>'+days+'</b>日</p>')+
+      '<span class="badge fix">ローテーションには入りません</span>';
+    ring.hidden=true;
+    return;
+  }
+
+  ring.hidden=false;
+  inner.className='hero-inner';
+
+  let q=p, s=slotOf(m,q), guard=0;
+  while(s<0 && guard++<60){ q++; s=slotOf(m,q); }
+  const start=periodStart(q), end=periodEnd(q);
+  const now = t>=start && t<=end;
+  const days=Math.max(0, Math.ceil((start-t)/DAY));
+  const label=slotLabel(s);
+
+  inner.innerHTML=
+    '<p class="status">'+(now?'今週が当番です':'つぎの当番')+'</p>'+
+    '<p class="place">'+label.replace(/[①②③④⑤]/,'')+
+      '<small>'+cfg.me+' さん'+(label.match(/[①②③④⑤]/)?'（'+label+'）':'')+'</small></p>'+
+    '<p class="when">'+fmt(start)+'〜'+fmt(end)+'</p>'+
+    (now ? '<p class="count">'+fmtLong(start)+' 〜 '+fmtLong(end)+'</p>'
+         : '<p class="count">あと<b>'+days+'</b>日</p>')+
+    (cfg.slots[s].gomi ? '<span class="badge gomi">ゴミ収集も担当</span>' : '');
+
+  drawRing(s);
+}
+
+function drawRing(cur){
+  const svg=document.getElementById('ring');
+  const n=cfg.slots.length; if(!n){ svg.innerHTML=''; return; }
+  const cx=165, cy=150, R=100;
+  let out='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="#2c4166" stroke-width="1"/>';
+  for(let i=0;i<n;i++){
+    const a=(-90 + 360*i/n)*Math.PI/180;
+    const x=cx+R*Math.cos(a), y=cy+R*Math.sin(a), on=(i===cur);
+    out+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(on?9:4)+'" fill="'+(on?'#cfe2ee':'#4a6a94')+'"/>';
+    const lx=cx+(R+26)*Math.cos(a), ly=cy+(R+26)*Math.sin(a)+4;
+    out+='<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" font-size="11.5" '+
+         'letter-spacing="1" fill="'+(on?'#ffffff':'#7e93b3')+'">'+slotLabel(i)+'</text>';
+  }
+  out+='<text x="'+cx+'" y="'+(cy-4)+'" text-anchor="middle" font-size="10" letter-spacing="3" fill="#6c82a4">つぎは</text>';
+  out+='<text x="'+cx+'" y="'+(cy+16)+'" text-anchor="middle" font-size="14" letter-spacing="2" fill="#a8bcd6">'+slotLabel((cur+1)%n)+'</text>';
+  svg.innerHTML=out;
+}
+
+function renderCurrent(p){
+  const rows=assignment(p);
+  document.getElementById('curRange').textContent=fmt(periodStart(p))+'〜'+fmt(periodEnd(p));
+  const tb=document.getElementById('curTable'); tb.innerHTML='';
+  cfg.slots.forEach((s,i)=>{
+    const tr=document.createElement('tr');
+    if(rows[i] && rows[i]===cfg.me) tr.className='mine';
+    tr.innerHTML='<td class="place">'+slotLabel(i)+'</td>'+
+      '<td class="name">'+(rows[i]||'<span class="vacant">空き</span>')+
+      (s.gomi?'<span class="tag gomi">ゴミ収集</span>':'')+'</td>';
+    tb.appendChild(tr);
+  });
+  cfg.fixed.forEach(f=>{
+    const tr=document.createElement('tr');
+    tr.className='fixedrow'+(f.names.includes(cfg.me)?' mine':'');
+    tr.innerHTML='<td class="place">'+f.place+'</td>'+
+      '<td class="name">'+(f.names.join('・')||'<span class="vacant">空き</span>')+
+      '<span class="tag fix">固定</span></td>';
+    tb.appendChild(tr);
+  });
+}
+
+function renderFuture(p){
+  const ul=document.getElementById('future'); ul.innerHTML='';
+  const fx=myFixed(), m=myIndex();
+  document.getElementById('futureFor').textContent=(fx||m>=0)?cfg.me+' さんの担当場所':'';
+  for(let k=1;k<=5;k++){
+    const q=p+k, li=document.createElement('li');
+    let label;
+    if(fx){
+      label='<span class="p">'+fx.place+'</span>'; li.className='mine';
+    }else if(m<0){
+      const rows=assignment(q);
+      label='<span class="p" style="font-size:12.5px">'+
+        cfg.slots.map((_,i)=>slotLabel(i)+'：'+(rows[i]||'空き')).join('／')+'</span>';
+    }else{
+      const s=slotOf(m,q);
+      if(s<0){ label='<span class="p" style="color:#8d9aad">お休み</span>'; }
+      else{ label='<span class="p">'+slotLabel(s)+'</span>'+
+              (cfg.slots[s].gomi?'<span class="tag gomi">ゴミ収集</span>':''); li.className='mine'; }
+    }
+    li.innerHTML='<span class="date">'+fmt(periodStart(q))+'〜'+fmt(periodEnd(q))+'</span>'+label;
+    ul.appendChild(li);
+  }
+}
+
+function renderYear(p){
+  const perYear=Math.ceil(52/cfg.intervalWeeks)+1;
+  const start=Math.max(0,p-1);
+  const periods=[]; for(let k=0;k<perYear;k++) periods.push(start+k);
+
+  let html='<colgroup><col>';
+  periods.forEach(q=>{ html+='<col'+(q===p?' class="now"':'')+'>'; });
+  html+='</colgroup><thead><tr><th class="rowhead">場所</th>';
+  periods.forEach(q=>{ html+='<th>'+fmt(periodStart(q))+'<br>〜'+fmt(periodEnd(q))+'</th>'; });
+  html+='</tr></thead><tbody>';
+
+  cfg.slots.forEach((s,i)=>{
+    html+='<tr><td class="rowhead">'+slotLabel(i)+(s.gomi?'<span class="tag gomi">ゴミ</span>':'')+'</td>';
+    periods.forEach(q=>{
+      const name=assignment(q)[i];
+      html+='<td'+(name&&name===cfg.me?' class="me"':'')+'>'+(name||'—')+'</td>';
+    });
+    html+='</tr>';
+  });
+  cfg.fixed.forEach(f=>{
+    const mine=f.names.includes(cfg.me);
+    html+='<tr class="fixedrow"><td class="rowhead">'+f.place+'</td>';
+    periods.forEach(()=>{ html+='<td'+(mine?' class="me"':'')+'>'+(f.names.join('・')||'—')+'</td>'; });
+    html+='</tr>';
+  });
+  html+='</tbody>';
+  document.getElementById('yearTable').innerHTML=html;
+}
+
+/* ---------- 設定 ---------- */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function renderSettings(){
+  const sl=document.getElementById('slotList'); sl.innerHTML='';
+  cfg.slots.forEach((s,i)=>{
+    const row=document.createElement('div'); row.className='setrow';
+    row.innerHTML=
+      '<input type="text" value="'+esc(s.place)+'" data-si="'+i+'" placeholder="場所名">'+
+      '<label class="chk"><input type="checkbox" data-gi="'+i+'" '+(s.gomi?'checked':'')+'>ゴミ</label>'+
+      '<button class="mini" data-up="'+i+'" title="上へ">↑</button>'+
+      '<button class="mini" data-del="'+i+'" title="削除">×</button>';
+    sl.appendChild(row);
+  });
+  const ml=document.getElementById('memberList'); ml.innerHTML='';
+  cfg.members.forEach((name,i)=>{
+    const row=document.createElement('div'); row.className='setrow';
+    row.innerHTML=
+      '<input type="text" value="'+esc(name)+'" data-mi="'+i+'" placeholder="名前">'+
+      '<button class="mini" data-mup="'+i+'" title="上へ">↑</button>'+
+      '<button class="mini" data-mdel="'+i+'" title="削除">×</button>';
+    ml.appendChild(row);
+  });
+  const fl=document.getElementById('fixedList'); fl.innerHTML='';
+  cfg.fixed.forEach((f,i)=>{
+    const row=document.createElement('div'); row.className='setrow';
+    row.innerHTML=
+      '<input type="text" value="'+esc(f.place)+'" data-fp="'+i+'" placeholder="場所" style="max-width:110px">'+
+      '<input type="text" value="'+esc(f.names.join('、'))+'" data-fn="'+i+'" placeholder="名前、名前">'+
+      '<button class="mini" data-fdel="'+i+'" title="削除">×</button>';
+    fl.appendChild(row);
+  });
+  const kl=document.getElementById('skipList'); kl.innerHTML='';
+  (cfg.skipWeeks||[]).forEach((v,i)=>{
+    const row=document.createElement('div'); row.className='setrow';
+    row.innerHTML=
+      '<input type="date" value="'+esc(v)+'" data-sk="'+i+'" style="flex:1">'+
+      '<button class="mini" data-skdel="'+i+'" title="削除">×</button>';
+    kl.appendChild(row);
+  });
+  document.getElementById('baseDate').value=cfg.baseDate;
+  document.getElementById('interval').value=cfg.intervalWeeks;
+}
+
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset.si!==undefined) cfg.slots[+t.dataset.si].place=t.value;
+  if(t.dataset.mi!==undefined) cfg.members[+t.dataset.mi]=t.value;
+  if(t.dataset.fp!==undefined) cfg.fixed[+t.dataset.fp].place=t.value;
+  if(t.dataset.fn!==undefined) cfg.fixed[+t.dataset.fn].names=
+    t.value.split(/[、,\s]+/).filter(Boolean);
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.gi!==undefined) cfg.slots[+t.dataset.gi].gomi=t.checked;
+  if(t.dataset.sk!==undefined && t.value){
+    const dt=d(t.value);
+    const mon=addDays(dt, -((dt.getDay()+6)%7));   // その週の月曜に寄せる
+    cfg.skipWeeks[+t.dataset.sk]=iso(mon);
+    renderSettings();
+  }
+  if(t.id==='baseDate'&&t.value) cfg.baseDate=t.value;
+  if(t.id==='interval') cfg.intervalWeeks=Math.max(1,+t.value||6);
+});
+document.addEventListener('click',e=>{
+  const ds=(e.target&&e.target.dataset)||{};
+  const swap=(arr,i)=>{ if(i>0){ const x=arr[i-1]; arr[i-1]=arr[i]; arr[i]=x; } };
+  if(ds.up!==undefined){ swap(cfg.slots,+ds.up); renderSettings(); }
+  if(ds.del!==undefined){ cfg.slots.splice(+ds.del,1); renderSettings(); }
+  if(ds.mup!==undefined){ swap(cfg.members,+ds.mup); renderSettings(); }
+  if(ds.mdel!==undefined){ cfg.members.splice(+ds.mdel,1); renderSettings(); }
+  if(ds.fdel!==undefined){ cfg.fixed.splice(+ds.fdel,1); renderSettings(); }
+  if(ds.skdel!==undefined){ cfg.skipWeeks.splice(+ds.skdel,1); renderSettings(); }
+});
+document.getElementById('addSlot').onclick=()=>{ cfg.slots.push({place:'新しい場所',gomi:false}); renderSettings(); };
+document.getElementById('addMember').onclick=()=>{ cfg.members.push('新しい人'); renderSettings(); };
+document.getElementById('addFixed').onclick=()=>{ cfg.fixed.push({place:'新しい場所',names:[]}); renderSettings(); };
+document.getElementById('addSkip').onclick=()=>{
+  if(!cfg.skipWeeks) cfg.skipWeeks=[];
+  const t=today();
+  cfg.skipWeeks.push(iso(addDays(t, -((t.getDay()+6)%7))));
+  renderSettings();
+};
+document.getElementById('printBtn').onclick=()=>window.print();
+document.getElementById('save').onclick=()=>{
+  cfg.slots=cfg.slots.filter(s=>s.place.trim());
+  cfg.members=cfg.members.filter(m=>m.trim());
+  cfg.fixed=cfg.fixed.filter(f=>f.place.trim());
+  cfg.skipWeeks=[...new Set((cfg.skipWeeks||[]).filter(Boolean))].sort();
+  const {rotating,fixed}=allNames();
+  if(!rotating.includes(cfg.me)&&!fixed.includes(cfg.me)) cfg.me='';
+  save(); renderSettings(); render(); toast('保存しました');
+};
+
+/* ---------- 保存 ----------
+   Claude内では window.storage、ダウンロードして開いたときは localStorage */
+const store={
+  async set(k,v){
+    if(window.storage&&window.storage.set) return window.storage.set(k,v);
+    localStorage.setItem(k,v);
+  },
+  async get(k){
+    if(window.storage&&window.storage.get) return window.storage.get(k);
+    const v=localStorage.getItem(k);
+    return v===null?null:{key:k,value:v};
+  }
+};
+async function save(quiet){
+  try{ await store.set(KEY, JSON.stringify(cfg)); }
+  catch(err){ if(!quiet) toast('保存できませんでした'); }
+}
+async function load(){
+  try{
+    const r=await store.get(KEY);
+    if(r&&r.value) cfg=Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), JSON.parse(r.value));
+  }catch(err){ /* 初回は未保存 */ }
+}
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),1800);
+}
+
+(async()=>{ await load(); renderSettings(); render(); })();
+</script>
+</body>
+</html>
