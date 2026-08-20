@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-08-20T07:30:40.688204+09:00",
+  "updatedAt": "2026-08-20T19:37:21.825844+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
+    {
+      "id": "auto-3be53ba105",
+      "airline": "Peach",
+      "type": "セール",
+      "title": "韓国旅行は「時間価値」で選ぶ時代へ 30・40代女性の約3人に1人が年2回以上訪れるリピーター",
+      "summary": "Peachは、9月20日（日）から東京（成田）- ソウル（仁川）線を開設します。運賃は片道 5,680 円から、9時台に成田を出発し、お昼にはソウルに到着するスケジュールで、到着後すぐに現地の魅力を最大限に楽しむこ...",
+      "url": "https://prtimes.jp/main/html/rd/p/000000041.000081560.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-08-20T14:00:02+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
     {
       "id": "auto-475bcce259",
       "airline": "JAL",
