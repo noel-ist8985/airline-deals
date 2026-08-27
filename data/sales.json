@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-08-27T12:02:06.730341+09:00",
+  "updatedAt": "2026-08-28T05:15:37.988763+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
+    {
+      "id": "auto-27cd508754",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "（共同リリース）JALとfav hospitality groupがマイル提携を開始",
+      "summary": "霞ヶ関キャピタル株式会社 fav hospitality group 株式会社 日本航空株式会社 [画像2: https://prtim...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001551.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-08-27T17:50:02+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
     {
       "id": "auto-3be53ba105",
       "airline": "Peach",
@@ -472,25 +491,6 @@
       "saleEnd": "",
       "travelPeriod": "",
       "postedAt": "2026-06-29T15:40:01+09:00",
-      "tags": [
-        "自動取得"
-      ],
-      "source": "PR TIMES"
-    },
-    {
-      "id": "auto-b71465e6de",
-      "airline": "JAL",
-      "type": "イベント",
-      "title": "【青森・北海道・大阪】（共同リリース）青森=大阪(伊丹)、札幌(新千歳)線就航50周年セレモニー記念イベントを開催",
-      "summary": "(共同リリース） 2026年6月2５日 日本航空株式会社 株式会社ジェイエア 2026年7月1日（水）で、JALグループは青森＝大阪（伊丹）線・札幌（新千歳）線の就航５0周年を迎えます。記念日となる7月1日（水）には..…",
-      "url": "https://prtimes.jp/main/html/rd/p/000001521.000030684.html",
-      "priceFrom": null,
-      "currency": "JPY",
-      "routes": [],
-      "saleStart": "",
-      "saleEnd": "",
-      "travelPeriod": "",
-      "postedAt": "2026-06-25T14:04:07+09:00",
       "tags": [
         "自動取得"
       ],
