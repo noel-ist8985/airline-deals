@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-30T09:01:57.807870+09:00",
+  "updatedAt": "2026-08-30T23:45:46.783002+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
     {
@@ -567,25 +567,6 @@
       "saleEnd": "",
       "travelPeriod": "",
       "postedAt": "2026-03-26T13:00:02+09:00",
-      "tags": [
-        "自動取得"
-      ],
-      "source": "PR TIMES"
-    },
-    {
-      "id": "auto-802edd33ca",
-      "airline": "Peach",
-      "type": "セール",
-      "title": "おかげさまで創業15周年！心からの感謝を込めて全路線が対象の「感謝セール」を開催",
-      "summary": "Peach Aviation株式会社（以下：Peach、代表取締役CEO：大橋 一成）は、2026年2月10日に創業15周年を迎えました。これまで支えてくださったすべてのお客さま、関係者のみなさまに心からの感謝を込めて、…",
-      "url": "https://prtimes.jp/main/html/rd/p/000000035.000081560.html",
-      "priceFrom": null,
-      "currency": "JPY",
-      "routes": [],
-      "saleStart": "",
-      "saleEnd": "",
-      "travelPeriod": "",
-      "postedAt": "2026-03-03T14:30:01+09:00",
       "tags": [
         "自動取得"
       ],
