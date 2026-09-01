@@ -168,6 +168,7 @@
   <div class="card">
     <h2>今回の当番<span class="meta" id="curRange"></span></h2>
     <table><tbody id="curTable"></tbody></table>
+    <p class="hint" id="extNote" hidden></p>
     <p class="hint">事務所掃除の人がすべてのごみ収集も担当</p>
   </div>
 
@@ -209,7 +210,7 @@
         <p class="fieldlabel">お休みの週（数えない週）</p>
         <div id="skipList"></div>
         <button class="add" id="addSkip">＋ お休みの週を追加</button>
-        <p class="hint">お盆や年末年始など、掃除をしない週の月曜日を入れてください。その週は数に入らず、以降の当番が1週ずつ後ろにずれます。</p>
+        <p class="hint">お盆や年末年始など、会社が休みの週の月曜日を入れてください。その週は数に入らず、以降の当番が1週ずつ後ろにずれます。祝日が3日以上ある週（ゴールデンウィークやシルバーウィークなど）は自動で数えない週になり、前の週の当番が引き続き担当するため、ここに入れる必要はありません。</p>
 
         <button class="save" id="save">保存する</button>
       </div>
@@ -256,18 +257,54 @@ function iso(dt){
 function fmt(dt){ return (dt.getMonth()+1)+'/'+dt.getDate(); }
 function fmtLong(dt){ return (dt.getMonth()+1)+'月'+dt.getDate()+'日('+'日月火水木金土'[dt.getDay()]+')'; }
 
+/* ---------- 日本の祝日（自動計算） ---------- */
+const holidayCache={};
+function holidaysOf(y){
+  if(holidayCache[y]) return holidayCache[y];
+  const set=new Set();
+  const add=(m,dd)=>set.add(y+'-'+String(m).padStart(2,'0')+'-'+String(dd).padStart(2,'0'));
+  const nthMon=(m,n)=>{ const w=new Date(y,m-1,1).getDay(); return 1+((8-w)%7)+7*(n-1); };
+  add(1,1);                 // 元日
+  add(1,nthMon(1,2));       // 成人の日
+  add(2,11); add(2,23);     // 建国記念の日・天皇誕生日
+  add(3,Math.floor(20.8431+0.242194*(y-1980))-Math.floor((y-1980)/4));  // 春分の日
+  add(4,29); add(5,3); add(5,4); add(5,5);  // 昭和の日・憲法記念日・みどりの日・こどもの日
+  add(7,nthMon(7,3));       // 海の日
+  add(8,11);                // 山の日
+  add(9,nthMon(9,3));       // 敬老の日
+  add(9,Math.floor(23.2488+0.242194*(y-1980))-Math.floor((y-1980)/4)); // 秋分の日
+  add(10,nthMon(10,2));     // スポーツの日
+  add(11,3); add(11,23);    // 文化の日・勤労感謝の日
+  [...set].forEach(s=>{     // 国民の休日（祝日にはさまれた平日）
+    const mid=addDays(d(s),1);
+    if(set.has(iso(addDays(d(s),2))) && !set.has(iso(mid)) && mid.getDay()!==0) set.add(iso(mid));
+  });
+  [...set].forEach(s=>{     // 振替休日（日曜の祝日のあとの平日）
+    if(d(s).getDay()===0){ let x=addDays(d(s),1); while(set.has(iso(x))) x=addDays(x,1); set.add(iso(x)); }
+  });
+  holidayCache[y]=set;
+  return set;
+}
+function isHoliday(dt){ return holidaysOf(dt.getFullYear()).has(iso(dt)); }
+function holidayDays(mon){  // その週(月〜金)の祝日の数
+  let c=0; for(let i=0;i<5;i++) if(isHoliday(addDays(mon,i))) c++;
+  return c;
+}
+
 /* 休みの週（月曜日）を除いた「数える週」の並び。
-   お盆や年末年始で1週飛ぶと、それ以降すべて後ろへずれます。 */
+   お盆や年末年始で1週飛ぶと、それ以降すべて後ろへずれます。
+   祝日が3日以上ある週も数えず、前の週の当番が引き続き担当します。 */
 function skipSet(){
   const s=new Set();
   (cfg.skipWeeks||[]).forEach(v=>{ if(v) s.add(v); });
   return s;
 }
+function isHolidaySkip(mon){ return !skipSet().has(iso(mon)) && holidayDays(mon)>=3; }
+function isSkippedWeek(mon){ return skipSet().has(iso(mon)) || holidayDays(mon)>=3; }
 function weekAt(n){                       // n番目の「数える週」の月曜日
-  const skip=skipSet();
   let dt=d(cfg.baseDate), count=0, guard=0;
   while(guard++ < 4000){
-    if(!skip.has(iso(dt))){
+    if(!isSkippedWeek(dt)){
       if(count===n) return dt;
       count++;
     }
@@ -277,13 +314,19 @@ function weekAt(n){                       // n番目の「数える週」の月�
 }
 function periodStart(p){ return weekAt(p*cfg.intervalWeeks); }
 function periodEnd(p){ return addDays(periodStart(p),4); }   // 月〜金
+function periodExt(p){    // 直後に祝日3日以上の週が続くあいだは引き続き担当
+  let end=periodEnd(p), mon=addDays(periodStart(p),7);
+  const weeks=[];
+  while(isHolidaySkip(mon)){ weeks.push(new Date(mon)); end=addDays(mon,4); mon=addDays(mon,7); }
+  return {end:end, weeks:weeks};
+}
 function today(){ const t=new Date(); return new Date(t.getFullYear(),t.getMonth(),t.getDate()); }
 
 function currentPeriod(){
   const t=today();
   if(t < d(cfg.baseDate)) return 0;
   let p=0;
-  while(p<200 && t > periodEnd(p)) p++;
+  while(p<200 && t > periodExt(p).end) p++;
   return p;
 }
 
@@ -348,7 +391,7 @@ function renderHero(p){
   const t=today();
 
   if(fx){                       // 固定担当の人
-    const start=periodStart(p), end=periodEnd(p);
+    const start=periodStart(p), end=periodExt(p).end;
     const now = t>=start && t<=end;
     const days=Math.max(0, Math.ceil((start-t)/DAY));
     inner.className='hero-inner pad';
@@ -368,7 +411,8 @@ function renderHero(p){
 
   let q=p, s=slotOf(m,q), guard=0;
   while(s<0 && guard++<60){ q++; s=slotOf(m,q); }
-  const start=periodStart(q), end=periodEnd(q);
+  const ext=periodExt(q);
+  const start=periodStart(q), end=ext.end;
   const now = t>=start && t<=end;
   const days=Math.max(0, Math.ceil((start-t)/DAY));
   const label=slotLabel(s);
@@ -380,7 +424,8 @@ function renderHero(p){
     '<p class="when">'+fmt(start)+'〜'+fmt(end)+'</p>'+
     (now ? '<p class="count">'+fmtLong(start)+' 〜 '+fmtLong(end)+'</p>'
          : '<p class="count">あと<b>'+days+'</b>日</p>')+
-    (cfg.slots[s].gomi ? '<span class="badge gomi">ゴミ収集も担当</span>' : '');
+    (cfg.slots[s].gomi ? '<span class="badge gomi">ゴミ収集も担当</span>' : '')+
+    (ext.weeks.length ? '<span class="badge fix">'+fmt(ext.weeks[0])+'の週も引き続き当番</span>' : '');
 
   drawRing(s);
 }
@@ -405,7 +450,12 @@ function drawRing(cur){
 
 function renderCurrent(p){
   const rows=assignment(p);
-  document.getElementById('curRange').textContent=fmt(periodStart(p))+'〜'+fmt(periodEnd(p));
+  const ext=periodExt(p);
+  document.getElementById('curRange').textContent=fmt(periodStart(p))+'〜'+fmt(ext.end);
+  const note=document.getElementById('extNote');
+  note.hidden=!ext.weeks.length;
+  if(ext.weeks.length)
+    note.textContent=fmt(ext.weeks[0])+'からの週は祝日が3日以上あるため、同じ当番が'+fmt(ext.end)+'まで引き続き担当します';
   const tb=document.getElementById('curTable'); tb.innerHTML='';
   cfg.slots.forEach((s,i)=>{
     const tr=document.createElement('tr');
@@ -444,7 +494,7 @@ function renderFuture(p){
       else{ label='<span class="p">'+slotLabel(s)+'</span>'+
               (cfg.slots[s].gomi?'<span class="tag gomi">ゴミ収集</span>':''); li.className='mine'; }
     }
-    li.innerHTML='<span class="date">'+fmt(periodStart(q))+'〜'+fmt(periodEnd(q))+'</span>'+label;
+    li.innerHTML='<span class="date">'+fmt(periodStart(q))+'〜'+fmt(periodExt(q).end)+'</span>'+label;
     ul.appendChild(li);
   }
 }
@@ -457,7 +507,7 @@ function renderYear(p){
   let html='<colgroup><col>';
   periods.forEach(q=>{ html+='<col'+(q===p?' class="now"':'')+'>'; });
   html+='</colgroup><thead><tr><th class="rowhead">場所</th>';
-  periods.forEach(q=>{ html+='<th>'+fmt(periodStart(q))+'<br>〜'+fmt(periodEnd(q))+'</th>'; });
+  periods.forEach(q=>{ html+='<th>'+fmt(periodStart(q))+'<br>〜'+fmt(periodExt(q).end)+'</th>'; });
   html+='</tr></thead><tbody>';
 
   cfg.slots.forEach((s,i)=>{
