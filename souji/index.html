@@ -169,7 +169,6 @@
     <h2>今回の当番<span class="meta" id="curRange"></span></h2>
     <table><tbody id="curTable"></tbody></table>
     <p class="hint" id="extNote" hidden></p>
-    <p class="hint">事務所掃除の人がすべてのごみ収集も担当</p>
   </div>
 
   <div class="card">
@@ -180,7 +179,6 @@
   <div class="card" id="yearCard">
     <h2>年間当番表<span class="meta"><button class="printbtn" id="printBtn">A4で印刷</button></span></h2>
     <div class="year-scroll"><table class="year" id="yearTable"></table></div>
-    <p class="hint">事務所掃除の人がすべてのごみ収集も担当</p>
   </div>
 
   <div class="card">
@@ -222,14 +220,14 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY = 'souji-touban:config:v7';
+const KEY = 'souji-touban:config:v8';
 
 /* 7/27〜7/31 の並びを基準にしています */
 const DEFAULTS = {
   slots: [
     {place:'玄関',   gomi:false},
     {place:'事務所', gomi:false},
-    {place:'事務所', gomi:true },
+    {place:'事務所', gomi:false},
     {place:'食堂',   gomi:false},
     {place:'食堂',   gomi:false},
     {place:'更衣室', gomi:false},
@@ -237,7 +235,7 @@ const DEFAULTS = {
     {place:'前室',   gomi:false}
   ],
   members: ['松浦','川本','赤名','森田','上代','曽田','泉','川島'],
-  fixed: [],
+  fixed: [{place:'ごみ収集', names:['田部']}],
   baseDate: '2026-07-27',
   intervalWeeks: 6,
   skipWeeks: ['2026-08-10'],   // お盆休み
