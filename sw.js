@@ -1,5 +1,5 @@
 /* Service Worker — オフラインキャッシュ & 通知クリック処理 */
-const CACHE = 'airline-deals-v3';
+const CACHE = 'airline-deals-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -31,6 +31,20 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+
+  // 掃除当番表は別アプリ。常に最新を表示したいので network-first
+  if (url.pathname.includes('/souji/')) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
 
   // データは最新優先(network-first)、失敗時キャッシュ
   if (url.pathname.endsWith('/data/sales.json') || url.pathname.endsWith('data/sales.json')) {
