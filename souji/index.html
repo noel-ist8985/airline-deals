@@ -58,6 +58,11 @@
   .hero .badge.gomi{background:#3a4e70;color:#ffd9ac}
   .hero .badge.fix{background:#2f4a3d;color:#bfe0cd}
   .hero .pad{padding-bottom:22px}
+  .hero .toilet{margin:16px 0 0;padding-top:13px;border-top:1px solid #2c4166;
+                font-size:13px;color:#c6d6e8}
+  .hero .toilet b{display:block;font-family:var(--mincho);font-size:17px;
+                  letter-spacing:.08em;color:#fff;margin-top:3px;font-weight:600}
+  .hero .toilet .ttl{font-size:11px;letter-spacing:.24em;color:#93a8c4}
 
   .ring{display:block;margin:0 auto;max-width:100%}
   .ring text{font-family:var(--gothic)}
@@ -139,6 +144,7 @@
     header.top,.card,footer{display:none!important}
     #yearCard{display:block!important;border:none;padding:0;margin:0}
     #yearCard h2{font-size:18px;border-bottom:2px solid var(--ink);letter-spacing:.2em}
+    #yearCard .fieldlabel{margin:14px 0 6px;color:var(--ink);font-size:12px}
     #yearCard .printbtn{display:none}
     .year-scroll{overflow:visible}
     table.year{min-width:0;width:100%;font-size:12px}
@@ -168,6 +174,12 @@
   </div>
 
   <div class="card">
+    <h2>トイレ掃除<span class="meta" id="toiletRange"></span></h2>
+    <table><tbody id="toiletTable"></tbody></table>
+    <p class="hint">掃除当番のひとつ前の週が担当です</p>
+  </div>
+
+  <div class="card">
     <h2>今回の当番<span class="meta" id="curRange"></span></h2>
     <table><tbody id="curTable"></tbody></table>
     <p class="hint" id="extNote" hidden></p>
@@ -181,6 +193,8 @@
   <div class="card" id="yearCard">
     <h2>年間当番表<span class="meta"><button class="printbtn" id="printBtn">A4で印刷</button></span></h2>
     <div class="year-scroll"><table class="year" id="yearTable"></table></div>
+    <p class="fieldlabel" style="margin-top:26px">トイレ掃除（掃除当番の前の週）</p>
+    <div class="year-scroll"><table class="year" id="yearToilet"></table></div>
   </div>
 
   <div class="card">
@@ -199,6 +213,18 @@
         <div id="fixedList"></div>
         <button class="add" id="addFixed">＋ 固定の担当を追加</button>
         <p class="hint">名前は「、」か「,」で区切ってください。</p>
+
+        <p class="fieldlabel">トイレ掃除の場所（この順に進みます）</p>
+        <div id="tSlotList"></div>
+        <button class="add" id="addTSlot">＋ 場所を追加</button>
+
+        <p class="fieldlabel">トイレ掃除のメンバー（基準日に上の場所を担当した順）</p>
+        <div id="tMemberList"></div>
+        <button class="add" id="addTMember">＋ メンバーを追加</button>
+
+        <p class="fieldlabel">トイレ掃除の固定担当</p>
+        <div id="tFixedList"></div>
+        <button class="add" id="addTFixed">＋ 固定の担当を追加</button>
 
         <p class="fieldlabel">基準になる回の開始日（月曜）</p>
         <input type="date" id="baseDate">
@@ -222,7 +248,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY = 'souji-touban:config:v9';
+const KEY = 'souji-touban:config:v10';
 
 /* 手書きの「事務所そうじ」表の①の列＝9/14の回 を基準にしています */
 const DEFAULTS = {
@@ -241,6 +267,24 @@ const DEFAULTS = {
   baseDate: '2026-09-14',
   intervalWeeks: 6,
   skipWeeks: [],
+  /* トイレ掃除は掃除当番の「前の週」。回ごとにひとつ下へ進みます（掃除当番とは逆向き） */
+  toilet: {
+    slots: [
+      {place:'事務所側 便座',       task:''},
+      {place:'事務所側 床',         task:'トイレットペーパーの補充'},
+      {place:'事務所側 手洗い場',   task:''},
+      {place:'工場内 便座',         task:''},
+      {place:'工場内 床',           task:'トイレットペーパーの補充'},
+      {place:'工場内 手洗い場',     task:''},
+      {place:'工場内 手洗い場周辺の床', task:''},
+      {place:'アルコール',          task:''}
+    ],
+    members: ['松浦','曽田','川本','川島','上代','森田','泉','赤名'],
+    fixed: [
+      {place:'汚物回収',           task:'2ヶ所', names:['田部']},
+      {place:'手洗い場のゴミ捨て', task:'',      names:['田部']}
+    ]
+  },
   me: ''
 };
 
@@ -320,6 +364,9 @@ function periodExt(p){    // 直後に祝日3日以上の週が続くあいだ�
   while(isHolidaySkip(mon)){ weeks.push(new Date(mon)); end=addDays(mon,4); mon=addDays(mon,7); }
   return {end:end, weeks:weeks};
 }
+/* トイレ掃除は掃除当番のひとつ前の週（月〜金） */
+function toiletStart(p){ return addDays(periodStart(p),-7); }
+function toiletEnd(p){ return addDays(toiletStart(p),4); }
 function today(){ const t=new Date(); return new Date(t.getFullYear(),t.getMonth(),t.getDate()); }
 
 function currentPeriod(){
@@ -348,17 +395,39 @@ function slotLabel(i){
   const n=cfg.slots.slice(0,i+1).filter(x=>x.place===s.place).length;
   return s.place+'①②③④⑤'[n-1];
 }
+/* ---------- トイレ掃除の割り当て（掃除当番とは逆向きに進みます） ---------- */
+function tSlotOf(m,p){
+  const T=cfg.toilet, N=Math.max(T.slots.length, T.members.length);
+  if(N===0) return -1;
+  const s=((m+p)%N+N)%N;
+  return s<T.slots.length ? s : -1;
+}
+function tAssignment(p){
+  const T=cfg.toilet, rows=T.slots.map(()=>null);
+  T.members.forEach((name,m)=>{ const s=tSlotOf(m,p); if(s>=0) rows[s]=name; });
+  return rows;
+}
+function tSlotLabel(i){ return cfg.toilet.slots[i].place; }
+function tMyIndex(){ return cfg.toilet.members.indexOf(cfg.me); }
+function tMyFixed(){ return cfg.toilet.fixed.filter(f=>f.names.includes(cfg.me)); }
+
 function myIndex(){ return cfg.members.indexOf(cfg.me); }
 function myFixed(){ return cfg.fixed.find(f=>f.names.includes(cfg.me)) || null; }
 function allNames(){
-  const f=[]; cfg.fixed.forEach(x=>x.names.forEach(n=>f.push(n)));
-  return {rotating:cfg.members.slice(), fixed:f};
+  const push=(arr,n)=>{ if(n && arr.indexOf(n)<0) arr.push(n); };
+  const rot=[];
+  cfg.members.forEach(n=>push(rot,n));
+  cfg.toilet.members.forEach(n=>push(rot,n));
+  const fx=[];
+  cfg.fixed.forEach(x=>x.names.forEach(n=>{ if(rot.indexOf(n)<0) push(fx,n); }));
+  cfg.toilet.fixed.forEach(x=>x.names.forEach(n=>{ if(rot.indexOf(n)<0) push(fx,n); }));
+  return {rotating:rot, fixed:fx};
 }
 
 /* ---------- 描画 ---------- */
 function render(){
   const p=currentPeriod();
-  renderWho(); renderHero(p); renderCurrent(p); renderFuture(p); renderYear(p);
+  renderWho(); renderHero(p); renderToilet(p); renderCurrent(p); renderFuture(p); renderYear(p);
 }
 
 function renderWho(){
@@ -377,6 +446,22 @@ function renderWho(){
     el.appendChild(lab);
     fixed.forEach(n=>el.appendChild(mk(n)));
   }
+}
+
+/* 自分のトイレ掃除の担当（掃除当番の前の週）。担当がなければ空文字 */
+function myToiletHTML(q){
+  const fx=tMyFixed(), m=tMyIndex();
+  let place;
+  if(fx.length) place=fx.map(f=>esc(f.place)+(f.task?'（'+esc(f.task)+'）':'')).join('・')+'（毎回）';
+  else if(m<0) return '';
+  else{
+    const s=tSlotOf(m,q);
+    if(s<0) return '';
+    place=esc(cfg.toilet.slots[s].place)+
+      (cfg.toilet.slots[s].task?'（'+esc(cfg.toilet.slots[s].task)+'）':'');
+  }
+  return '<p class="toilet"><span class="ttl">トイレ掃除</span>'+
+         fmt(toiletStart(q))+'〜'+fmt(toiletEnd(q))+'<b>'+place+'</b></p>';
 }
 
 function renderHero(p){
@@ -401,7 +486,8 @@ function renderHero(p){
       '<p class="when">'+fmt(start)+'〜'+fmt(end)+'</p>'+
       (now ? '<p class="count">'+fmtLong(start)+' 〜 '+fmtLong(end)+'</p>'
            : '<p class="count">あと<b>'+days+'</b>日</p>')+
-      '<span class="badge fix">ローテーションには入りません</span>';
+      '<span class="badge fix">ローテーションには入りません</span>'+
+      myToiletHTML(p);
     ring.hidden=true;
     return;
   }
@@ -426,7 +512,8 @@ function renderHero(p){
     (now ? '<p class="count">'+fmtLong(start)+' 〜 '+fmtLong(end)+'</p>'
          : '<p class="count">あと<b>'+days+'</b>日</p>')+
     (cfg.slots[s].gomi ? '<span class="badge gomi">ゴミ収集も担当</span>' : '')+
-    (ext.weeks.length ? '<span class="badge fix">'+fmt(ext.weeks[0])+'の週も引き続き当番</span>' : '');
+    (ext.weeks.length ? '<span class="badge fix">'+fmt(ext.weeks[0])+'の週も引き続き当番</span>' : '')+
+    myToiletHTML(q);
 
   drawRing(s);
 }
@@ -447,6 +534,29 @@ function drawRing(cur){
   out+='<text x="'+cx+'" y="'+(cy-4)+'" text-anchor="middle" font-size="10" letter-spacing="3" fill="#6c82a4">つぎは</text>';
   out+='<text x="'+cx+'" y="'+(cy+16)+'" text-anchor="middle" font-size="14" letter-spacing="2" fill="#a8bcd6">'+slotLabel((cur-1+n)%n)+'</text>';
   svg.innerHTML=out;
+}
+
+function renderToilet(p){
+  const rows=tAssignment(p);
+  document.getElementById('toiletRange').textContent=fmt(toiletStart(p))+'〜'+fmt(toiletEnd(p));
+  const tb=document.getElementById('toiletTable'); tb.innerHTML='';
+  cfg.toilet.slots.forEach((s,i)=>{
+    const tr=document.createElement('tr');
+    if(rows[i] && rows[i]===cfg.me) tr.className='mine';
+    tr.innerHTML='<td class="place">'+esc(s.place)+
+      (s.task?'<span class="task">'+esc(s.task)+'</span>':'')+'</td>'+
+      '<td class="name">'+(rows[i]||'<span class="vacant">空き</span>')+'</td>';
+    tb.appendChild(tr);
+  });
+  cfg.toilet.fixed.forEach(f=>{
+    const tr=document.createElement('tr');
+    tr.className='fixedrow'+(f.names.includes(cfg.me)?' mine':'');
+    tr.innerHTML='<td class="place">'+esc(f.place)+
+      (f.task?'<span class="task">'+esc(f.task)+'</span>':'')+'</td>'+
+      '<td class="name">'+(f.names.join('・')||'<span class="vacant">空き</span>')+
+      '<span class="tag fix">固定</span></td>';
+    tb.appendChild(tr);
+  });
 }
 
 function renderCurrent(p){
@@ -528,6 +638,29 @@ function renderYear(p){
   });
   html+='</tbody>';
   document.getElementById('yearTable').innerHTML=html;
+
+  /* トイレ掃除（前の週） */
+  let th='<colgroup><col>';
+  periods.forEach(q=>{ th+='<col'+(q===p?' class="now"':'')+'>'; });
+  th+='</colgroup><thead><tr><th class="rowhead">場所</th>';
+  periods.forEach(q=>{ th+='<th>'+fmt(toiletStart(q))+'<br>〜'+fmt(toiletEnd(q))+'</th>'; });
+  th+='</tr></thead><tbody>';
+  cfg.toilet.slots.forEach((s,i)=>{
+    th+='<tr><td class="rowhead">'+esc(s.place)+'</td>';
+    periods.forEach(q=>{
+      const name=tAssignment(q)[i];
+      th+='<td'+(name&&name===cfg.me?' class="me"':'')+'>'+(name||'—')+'</td>';
+    });
+    th+='</tr>';
+  });
+  cfg.toilet.fixed.forEach(f=>{
+    const mine=f.names.includes(cfg.me);
+    th+='<tr class="fixedrow"><td class="rowhead">'+esc(f.place)+'</td>';
+    periods.forEach(()=>{ th+='<td'+(mine?' class="me"':'')+'>'+(f.names.join('・')||'—')+'</td>'; });
+    th+='</tr>';
+  });
+  th+='</tbody>';
+  document.getElementById('yearToilet').innerHTML=th;
 }
 
 /* ---------- 設定 ---------- */
@@ -562,6 +695,34 @@ function renderSettings(){
       '<button class="mini" data-fdel="'+i+'" title="削除">×</button>';
     fl.appendChild(row);
   });
+  const tsl=document.getElementById('tSlotList'); tsl.innerHTML='';
+  cfg.toilet.slots.forEach((s,i)=>{
+    const row=document.createElement('div'); row.className='setrow';
+    row.innerHTML=
+      '<input type="text" value="'+esc(s.place)+'" data-tsi="'+i+'" placeholder="場所名">'+
+      '<input type="text" value="'+esc(s.task||'')+'" data-tst="'+i+'" placeholder="やること" style="max-width:120px">'+
+      '<button class="mini" data-tsup="'+i+'" title="上へ">↑</button>'+
+      '<button class="mini" data-tsdel="'+i+'" title="削除">×</button>';
+    tsl.appendChild(row);
+  });
+  const tml=document.getElementById('tMemberList'); tml.innerHTML='';
+  cfg.toilet.members.forEach((name,i)=>{
+    const row=document.createElement('div'); row.className='setrow';
+    row.innerHTML=
+      '<input type="text" value="'+esc(name)+'" data-tmi="'+i+'" placeholder="名前">'+
+      '<button class="mini" data-tmup="'+i+'" title="上へ">↑</button>'+
+      '<button class="mini" data-tmdel="'+i+'" title="削除">×</button>';
+    tml.appendChild(row);
+  });
+  const tfl=document.getElementById('tFixedList'); tfl.innerHTML='';
+  cfg.toilet.fixed.forEach((f,i)=>{
+    const row=document.createElement('div'); row.className='setrow';
+    row.innerHTML=
+      '<input type="text" value="'+esc(f.place)+'" data-tfp="'+i+'" placeholder="場所" style="max-width:110px">'+
+      '<input type="text" value="'+esc(f.names.join('、'))+'" data-tfn="'+i+'" placeholder="名前、名前">'+
+      '<button class="mini" data-tfdel="'+i+'" title="削除">×</button>';
+    tfl.appendChild(row);
+  });
   const kl=document.getElementById('skipList'); kl.innerHTML='';
   (cfg.skipWeeks||[]).forEach((v,i)=>{
     const row=document.createElement('div'); row.className='setrow';
@@ -581,6 +742,12 @@ document.addEventListener('input',e=>{
   if(t.dataset.mi!==undefined) cfg.members[+t.dataset.mi]=t.value;
   if(t.dataset.fp!==undefined) cfg.fixed[+t.dataset.fp].place=t.value;
   if(t.dataset.fn!==undefined) cfg.fixed[+t.dataset.fn].names=
+    t.value.split(/[、,\s]+/).filter(Boolean);
+  if(t.dataset.tsi!==undefined) cfg.toilet.slots[+t.dataset.tsi].place=t.value;
+  if(t.dataset.tst!==undefined) cfg.toilet.slots[+t.dataset.tst].task=t.value;
+  if(t.dataset.tmi!==undefined) cfg.toilet.members[+t.dataset.tmi]=t.value;
+  if(t.dataset.tfp!==undefined) cfg.toilet.fixed[+t.dataset.tfp].place=t.value;
+  if(t.dataset.tfn!==undefined) cfg.toilet.fixed[+t.dataset.tfn].names=
     t.value.split(/[、,\s]+/).filter(Boolean);
 });
 document.addEventListener('change',e=>{
@@ -604,10 +771,18 @@ document.addEventListener('click',e=>{
   if(ds.mdel!==undefined){ cfg.members.splice(+ds.mdel,1); renderSettings(); }
   if(ds.fdel!==undefined){ cfg.fixed.splice(+ds.fdel,1); renderSettings(); }
   if(ds.skdel!==undefined){ cfg.skipWeeks.splice(+ds.skdel,1); renderSettings(); }
+  if(ds.tsup!==undefined){ swap(cfg.toilet.slots,+ds.tsup); renderSettings(); }
+  if(ds.tsdel!==undefined){ cfg.toilet.slots.splice(+ds.tsdel,1); renderSettings(); }
+  if(ds.tmup!==undefined){ swap(cfg.toilet.members,+ds.tmup); renderSettings(); }
+  if(ds.tmdel!==undefined){ cfg.toilet.members.splice(+ds.tmdel,1); renderSettings(); }
+  if(ds.tfdel!==undefined){ cfg.toilet.fixed.splice(+ds.tfdel,1); renderSettings(); }
 });
 document.getElementById('addSlot').onclick=()=>{ cfg.slots.push({place:'新しい場所',gomi:false}); renderSettings(); };
 document.getElementById('addMember').onclick=()=>{ cfg.members.push('新しい人'); renderSettings(); };
 document.getElementById('addFixed').onclick=()=>{ cfg.fixed.push({place:'新しい場所',names:[]}); renderSettings(); };
+document.getElementById('addTSlot').onclick=()=>{ cfg.toilet.slots.push({place:'新しい場所',task:''}); renderSettings(); };
+document.getElementById('addTMember').onclick=()=>{ cfg.toilet.members.push('新しい人'); renderSettings(); };
+document.getElementById('addTFixed').onclick=()=>{ cfg.toilet.fixed.push({place:'新しい場所',task:'',names:[]}); renderSettings(); };
 document.getElementById('addSkip').onclick=()=>{
   if(!cfg.skipWeeks) cfg.skipWeeks=[];
   const t=today();
@@ -619,6 +794,9 @@ document.getElementById('save').onclick=()=>{
   cfg.slots=cfg.slots.filter(s=>s.place.trim());
   cfg.members=cfg.members.filter(m=>m.trim());
   cfg.fixed=cfg.fixed.filter(f=>f.place.trim());
+  cfg.toilet.slots=cfg.toilet.slots.filter(s=>s.place.trim());
+  cfg.toilet.members=cfg.toilet.members.filter(m=>m.trim());
+  cfg.toilet.fixed=cfg.toilet.fixed.filter(f=>f.place.trim());
   cfg.skipWeeks=[...new Set((cfg.skipWeeks||[]).filter(Boolean))].sort();
   const {rotating,fixed}=allNames();
   if(!rotating.includes(cfg.me)&&!fixed.includes(cfg.me)) cfg.me='';
