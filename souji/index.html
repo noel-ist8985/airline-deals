@@ -27,6 +27,12 @@
 
   .card{background:var(--card);border:1px solid var(--line);border-radius:3px;
         padding:20px 18px;margin-bottom:16px}
+
+  .section{display:flex;align-items:baseline;gap:11px;margin:38px 0 14px}
+  .section b{font-family:var(--mincho);font-size:17px;letter-spacing:.2em;
+             font-weight:600;color:var(--ink);white-space:nowrap}
+  .section span{font-size:11px;color:var(--muted);letter-spacing:.06em;white-space:nowrap}
+  .section i{flex:1;height:1px;background:var(--line)}
   .card h2{font-family:var(--mincho);font-size:15px;letter-spacing:.16em;font-weight:600;
            margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid var(--line);
            display:flex;justify-content:space-between;align-items:baseline;gap:10px}
@@ -58,11 +64,7 @@
   .hero .badge.gomi{background:#3a4e70;color:#ffd9ac}
   .hero .badge.fix{background:#2f4a3d;color:#bfe0cd}
   .hero .pad{padding-bottom:22px}
-  .hero .toilet{margin:16px 0 0;padding-top:13px;border-top:1px solid #2c4166;
-                font-size:13px;color:#c6d6e8}
-  .hero .toilet b{display:block;font-family:var(--mincho);font-size:17px;
-                  letter-spacing:.08em;color:#fff;margin-top:3px;font-weight:600}
-  .hero .toilet .ttl{font-size:11px;letter-spacing:.24em;color:#93a8c4}
+  .hero .place.multi{font-size:25px;line-height:1.45}
 
   .ring{display:block;margin:0 auto;max-width:100%}
   .ring text{font-family:var(--gothic)}
@@ -73,6 +75,8 @@
   td.place{font-family:var(--mincho);letter-spacing:.1em;width:38%;color:var(--ink)}
   td.place .task{display:block;font-family:var(--gothic);font-size:11px;letter-spacing:.02em;
                  color:var(--muted);margin-top:2px;line-height:1.5}
+  /* トイレ掃除は場所名が長いので幅を広めに */
+  #toiletTable td.place{width:52%;letter-spacing:.03em}
   td.name{font-size:16px}
   tr.mine td{background:var(--blue-fill)}
   tr.mine td.name{font-weight:700}
@@ -141,7 +145,7 @@
     @page{size:A4 landscape;margin:12mm}
     body{background:#fff}
     .wrap{max-width:none;padding:0}
-    header.top,.card,footer{display:none!important}
+    header.top,.card,footer,.section{display:none!important}
     #yearCard{display:block!important;border:none;padding:0;margin:0}
     #yearCard h2{font-size:18px;border-bottom:2px solid var(--ink);letter-spacing:.2em}
     #yearCard .fieldlabel{margin:14px 0 6px;color:var(--ink);font-size:12px}
@@ -160,7 +164,7 @@
   <header class="top">
     <p class="eyebrow">ROTATION</p>
     <h1>掃除当番</h1>
-    <p class="sub">当番は月曜から金曜までの5日間。6週に1回まわってきて、担当場所は毎回ひとつずつ入れかわります。</p>
+    <p class="sub">当番は月曜から金曜までの5日間。6週に1回まわってきます。はじめの週がトイレ掃除、つぎの週が事務所掃除です。</p>
   </header>
 
   <div class="card">
@@ -168,19 +172,26 @@
     <div class="who" id="who"></div>
   </div>
 
+  <p class="section"><b>トイレ掃除</b><span>さきの週</span><i></i></p>
+
+  <div class="card hero" id="tHero" hidden>
+    <div class="hero-inner pad" id="tHeroInner"></div>
+  </div>
+
+  <div class="card">
+    <h2>担当ひとらん<span class="meta" id="toiletRange"></span></h2>
+    <table><tbody id="toiletTable"></tbody></table>
+  </div>
+
+  <p class="section"><b>事務所掃除</b><span>あとの週</span><i></i></p>
+
   <div class="card hero" id="hero" hidden>
     <div class="hero-inner" id="heroInner"></div>
     <svg class="ring" id="ring" viewBox="0 0 330 300" role="img" aria-label="担当場所のローテーション図"></svg>
   </div>
 
   <div class="card">
-    <h2>トイレ掃除<span class="meta" id="toiletRange"></span></h2>
-    <table><tbody id="toiletTable"></tbody></table>
-    <p class="hint">掃除当番のひとつ前の週が担当です</p>
-  </div>
-
-  <div class="card">
-    <h2>今回の当番<span class="meta" id="curRange"></span></h2>
+    <h2>担当ひとらん<span class="meta" id="curRange"></span></h2>
     <table><tbody id="curTable"></tbody></table>
     <p class="hint" id="extNote" hidden></p>
   </div>
@@ -427,7 +438,8 @@ function allNames(){
 /* ---------- 描画 ---------- */
 function render(){
   const p=currentPeriod();
-  renderWho(); renderHero(p); renderToilet(p); renderCurrent(p); renderFuture(p); renderYear(p);
+  renderWho(); renderToiletHero(p); renderToilet(p);
+  renderHero(p); renderCurrent(p); renderFuture(p); renderYear(p);
 }
 
 function renderWho(){
@@ -448,20 +460,40 @@ function renderWho(){
   }
 }
 
-/* 自分のトイレ掃除の担当（掃除当番の前の週）。担当がなければ空文字 */
-function myToiletHTML(q){
+/* トイレ掃除のヒーロー表示（自分を選んだとき） */
+function renderToiletHero(p){
+  const hero=document.getElementById('tHero');
+  const inner=document.getElementById('tHeroInner');
   const fx=tMyFixed(), m=tMyIndex();
-  let place;
-  if(fx.length) place=fx.map(f=>esc(f.place)+(f.task?'（'+esc(f.task)+'）':'')).join('・')+'（毎回）';
-  else if(m<0) return '';
-  else{
-    const s=tSlotOf(m,q);
-    if(s<0) return '';
-    place=esc(cfg.toilet.slots[s].place)+
-      (cfg.toilet.slots[s].task?'（'+esc(cfg.toilet.slots[s].task)+'）':'');
+
+  if(!cfg.me || (!fx.length && m<0)){ hero.hidden=true; return; }
+  hero.hidden=false;
+
+  let q=p, place, sub, cls='';
+  if(fx.length){
+    place=fx.map(f=>esc(f.place)+(f.task?'（'+esc(f.task)+'）':'')).join('<br>');
+    sub=cfg.me+' さん（毎回このばしょ）';
+    if(fx.length>1) cls=' multi';
+  }else{
+    let s=tSlotOf(m,q), guard=0;
+    while(s<0 && guard++<60){ q++; s=tSlotOf(m,q); }
+    const sl=cfg.toilet.slots[s];
+    place=esc(sl.place);
+    sub=cfg.me+' さん'+(sl.task?'　'+esc(sl.task):'');
+    if(sl.place.length>10) cls=' multi';
   }
-  return '<p class="toilet"><span class="ttl">トイレ掃除</span>'+
-         fmt(toiletStart(q))+'〜'+fmt(toiletEnd(q))+'<b>'+place+'</b></p>';
+
+  const t=today(), start=toiletStart(q), end=toiletEnd(q);
+  const now = t>=start && t<=end;
+  const days=Math.max(0, Math.ceil((start-t)/DAY));
+
+  inner.innerHTML=
+    '<p class="status">'+(now?'今週がトイレ掃除です':'つぎのトイレ掃除')+'</p>'+
+    '<p class="place'+cls+'">'+place+'<small>'+sub+'</small></p>'+
+    '<p class="when">'+fmt(start)+'〜'+fmt(end)+'</p>'+
+    (now ? '<p class="count">'+fmtLong(start)+' 〜 '+fmtLong(end)+'</p>'
+         : '<p class="count">あと<b>'+days+'</b>日</p>')+
+    (fx.length ? '<span class="badge fix">ローテーションには入りません</span>' : '');
 }
 
 function renderHero(p){
@@ -486,8 +518,7 @@ function renderHero(p){
       '<p class="when">'+fmt(start)+'〜'+fmt(end)+'</p>'+
       (now ? '<p class="count">'+fmtLong(start)+' 〜 '+fmtLong(end)+'</p>'
            : '<p class="count">あと<b>'+days+'</b>日</p>')+
-      '<span class="badge fix">ローテーションには入りません</span>'+
-      myToiletHTML(p);
+      '<span class="badge fix">ローテーションには入りません</span>';
     ring.hidden=true;
     return;
   }
@@ -512,8 +543,7 @@ function renderHero(p){
     (now ? '<p class="count">'+fmtLong(start)+' 〜 '+fmtLong(end)+'</p>'
          : '<p class="count">あと<b>'+days+'</b>日</p>')+
     (cfg.slots[s].gomi ? '<span class="badge gomi">ゴミ収集も担当</span>' : '')+
-    (ext.weeks.length ? '<span class="badge fix">'+fmt(ext.weeks[0])+'の週も引き続き当番</span>' : '')+
-    myToiletHTML(q);
+    (ext.weeks.length ? '<span class="badge fix">'+fmt(ext.weeks[0])+'の週も引き続き当番</span>' : '');
 
   drawRing(s);
 }
