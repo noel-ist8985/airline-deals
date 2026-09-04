@@ -64,7 +64,10 @@
   .hero .badge.gomi{background:#3a4e70;color:#ffd9ac}
   .hero .badge.fix{background:#2f4a3d;color:#bfe0cd}
   .hero .pad{padding-bottom:22px}
-  .hero .place.multi{font-size:25px;line-height:1.45}
+  /* 場所名の長さに応じて自動で縮めて1行に収める */
+  .hero .place.s1{font-size:30px;letter-spacing:.08em}
+  .hero .place.s2{font-size:23px;letter-spacing:.05em}
+  .hero .place.s3{font-size:18px;letter-spacing:.02em}
 
   .ring{display:block;margin:0 auto;max-width:100%}
   .ring text{font-family:var(--gothic)}
@@ -460,6 +463,15 @@ function renderWho(){
   }
 }
 
+/* 場所名が長いときは文字を小さくして1行に収める */
+function placeCls(txt){
+  const n=String(txt).length;
+  if(n<=6)  return '';
+  if(n<=9)  return ' s1';
+  if(n<=13) return ' s2';
+  return ' s3';
+}
+
 /* トイレ掃除のヒーロー表示（自分を選んだとき） */
 function renderToiletHero(p){
   const hero=document.getElementById('tHero');
@@ -469,18 +481,18 @@ function renderToiletHero(p){
   if(!cfg.me || (!fx.length && m<0)){ hero.hidden=true; return; }
   hero.hidden=false;
 
-  let q=p, place, sub, cls='';
+  let q=p, place, sub, cls;
   if(fx.length){
-    place=fx.map(f=>esc(f.place)+(f.task?'（'+esc(f.task)+'）':'')).join('<br>');
-    sub=cfg.me+' さん（毎回このばしょ）';
-    if(fx.length>1) cls=' multi';
+    const raw=fx.map(f=>f.place).join('・');
+    const notes=fx.filter(f=>f.task).map(f=>f.place+'は'+f.task).join('、');
+    place=esc(raw); cls=placeCls(raw);
+    sub=cfg.me+' さん（毎回このばしょ）'+(notes?'　'+esc(notes):'');
   }else{
     let s=tSlotOf(m,q), guard=0;
     while(s<0 && guard++<60){ q++; s=tSlotOf(m,q); }
     const sl=cfg.toilet.slots[s];
-    place=esc(sl.place);
+    place=esc(sl.place); cls=placeCls(sl.place);
     sub=cfg.me+' さん'+(sl.task?'　'+esc(sl.task):'');
-    if(sl.place.length>10) cls=' multi';
   }
 
   const t=today(), start=toiletStart(q), end=toiletEnd(q);
@@ -514,7 +526,8 @@ function renderHero(p){
     inner.className='hero-inner pad';
     inner.innerHTML=
       '<p class="status">'+(now?'今週が当番です':'つぎの当番')+'</p>'+
-      '<p class="place">'+fx.place+'<small>'+cfg.me+' さん（毎回このばしょ）</small></p>'+
+      '<p class="place'+placeCls(fx.place)+'">'+esc(fx.place)+
+        '<small>'+cfg.me+' さん（毎回このばしょ）</small></p>'+
       '<p class="when">'+fmt(start)+'〜'+fmt(end)+'</p>'+
       (now ? '<p class="count">'+fmtLong(start)+' 〜 '+fmtLong(end)+'</p>'
            : '<p class="count">あと<b>'+days+'</b>日</p>')+
@@ -536,7 +549,7 @@ function renderHero(p){
 
   inner.innerHTML=
     '<p class="status">'+(now?'今週が当番です':'つぎの当番')+'</p>'+
-    '<p class="place">'+label.replace(/[①②③④⑤]/,'')+
+    '<p class="place'+placeCls(label.replace(/[①②③④⑤]/,''))+'">'+label.replace(/[①②③④⑤]/,'')+
       '<small>'+cfg.me+' さん'+(label.match(/[①②③④⑤]/)?'（'+label+'）':'')+
       (cfg.slots[s].task?'　'+esc(cfg.slots[s].task):'')+'</small></p>'+
     '<p class="when">'+fmt(start)+'〜'+fmt(end)+'</p>'+
