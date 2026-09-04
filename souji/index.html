@@ -262,7 +262,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY = 'souji-touban:config:v10';
+const KEY = 'souji-touban:config:v11';
 
 /* 手書きの「事務所そうじ」表の①の列＝9/14の回 を基準にしています */
 const DEFAULTS = {
@@ -295,8 +295,7 @@ const DEFAULTS = {
     ],
     members: ['松浦','曽田','川本','川島','上代','森田','泉','赤名'],
     fixed: [
-      {place:'汚物回収',           task:'2ヶ所', names:['田部']},
-      {place:'手洗い場のゴミ捨て', task:'',      names:['田部']}
+      {place:'汚物回収・手洗い場のゴミ捨て', task:'汚物回収は2ヶ所', names:['田部']}
     ]
   },
   me: ''
@@ -484,7 +483,8 @@ function renderToiletHero(p){
   let q=p, place, sub, cls;
   if(fx.length){
     const raw=fx.map(f=>f.place).join('・');
-    const notes=fx.filter(f=>f.task).map(f=>f.place+'は'+f.task).join('、');
+    const notes=fx.length===1 ? (fx[0].task||'')
+      : fx.filter(f=>f.task).map(f=>f.place+'は'+f.task).join('、');
     place=esc(raw); cls=placeCls(raw);
     sub=cfg.me+' さん（毎回このばしょ）'+(notes?'　'+esc(notes):'');
   }else{
