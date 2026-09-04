@@ -66,6 +66,8 @@
   td{padding:9px 8px;border-bottom:1px solid #eef1f4;vertical-align:middle}
   tr:last-child td{border-bottom:none}
   td.place{font-family:var(--mincho);letter-spacing:.1em;width:38%;color:var(--ink)}
+  td.place .task{display:block;font-family:var(--gothic);font-size:11px;letter-spacing:.02em;
+                 color:var(--muted);margin-top:2px;line-height:1.5}
   td.name{font-size:16px}
   tr.mine td{background:var(--blue-fill)}
   tr.mine td.name{font-weight:700}
@@ -152,7 +154,7 @@
   <header class="top">
     <p class="eyebrow">ROTATION</p>
     <h1>掃除当番</h1>
-    <p class="sub">当番は月曜から金曜までの5日間。6週に1回まわってきて、担当場所はひとつずつ後ろへずれていきます。</p>
+    <p class="sub">当番は月曜から金曜までの5日間。6週に1回まわってきて、担当場所は毎回ひとつずつ入れかわります。</p>
   </header>
 
   <div class="card">
@@ -220,25 +222,25 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY = 'souji-touban:config:v8';
+const KEY = 'souji-touban:config:v9';
 
-/* 7/27〜7/31 の並びを基準にしています */
+/* 手書きの「事務所そうじ」表の①の列＝9/14の回 を基準にしています */
 const DEFAULTS = {
   slots: [
-    {place:'玄関',   gomi:false},
-    {place:'事務所', gomi:false},
-    {place:'事務所', gomi:false},
-    {place:'食堂',   gomi:false},
-    {place:'食堂',   gomi:false},
-    {place:'更衣室', gomi:false},
-    {place:'前室',   gomi:false},
-    {place:'前室',   gomi:false}
+    {place:'玄関',     task:'',                        gomi:false},
+    {place:'前室A',    task:'手洗い場、ペーパータオル補充', gomi:false},
+    {place:'前室B',    task:'床、マットはがし',           gomi:false},
+    {place:'事務所C',  task:'椅子ふきそうじ',             gomi:false},
+    {place:'事務所D',  task:'床そうじ',                  gomi:false},
+    {place:'食堂★',    task:'床そうじ',                  gomi:false},
+    {place:'食堂●',    task:'机ふき',                    gomi:false},
+    {place:'ゴミ捨て', task:'排水口、事務所',             gomi:false}
   ],
-  members: ['松浦','川本','赤名','森田','上代','曽田','泉','川島'],
-  fixed: [{place:'ごみ収集', names:['田部']}],
-  baseDate: '2026-07-27',
+  members: ['赤名','松浦','曽田','川本','川島','上代','森田','泉'],
+  fixed: [{place:'更衣室', names:['田部']}],
+  baseDate: '2026-09-14',
   intervalWeeks: 6,
-  skipWeeks: ['2026-08-10'],   // お盆休み
+  skipWeeks: [],
   me: ''
 };
 
@@ -332,7 +334,7 @@ function currentPeriod(){
 function slotOf(m,p){
   const N=Math.max(cfg.slots.length, cfg.members.length);
   if(N===0) return -1;
-  const s=((m+p)%N+N)%N;
+  const s=((m-p)%N+N)%N;          // 回ごとに表の上へ（逆回り）
   return s<cfg.slots.length ? s : -1;      // -1 は休み
 }
 function assignment(p){
@@ -418,7 +420,8 @@ function renderHero(p){
   inner.innerHTML=
     '<p class="status">'+(now?'今週が当番です':'つぎの当番')+'</p>'+
     '<p class="place">'+label.replace(/[①②③④⑤]/,'')+
-      '<small>'+cfg.me+' さん'+(label.match(/[①②③④⑤]/)?'（'+label+'）':'')+'</small></p>'+
+      '<small>'+cfg.me+' さん'+(label.match(/[①②③④⑤]/)?'（'+label+'）':'')+
+      (cfg.slots[s].task?'　'+esc(cfg.slots[s].task):'')+'</small></p>'+
     '<p class="when">'+fmt(start)+'〜'+fmt(end)+'</p>'+
     (now ? '<p class="count">'+fmtLong(start)+' 〜 '+fmtLong(end)+'</p>'
          : '<p class="count">あと<b>'+days+'</b>日</p>')+
@@ -442,7 +445,7 @@ function drawRing(cur){
          'letter-spacing="1" fill="'+(on?'#ffffff':'#7e93b3')+'">'+slotLabel(i)+'</text>';
   }
   out+='<text x="'+cx+'" y="'+(cy-4)+'" text-anchor="middle" font-size="10" letter-spacing="3" fill="#6c82a4">つぎは</text>';
-  out+='<text x="'+cx+'" y="'+(cy+16)+'" text-anchor="middle" font-size="14" letter-spacing="2" fill="#a8bcd6">'+slotLabel((cur+1)%n)+'</text>';
+  out+='<text x="'+cx+'" y="'+(cy+16)+'" text-anchor="middle" font-size="14" letter-spacing="2" fill="#a8bcd6">'+slotLabel((cur-1+n)%n)+'</text>';
   svg.innerHTML=out;
 }
 
@@ -458,7 +461,8 @@ function renderCurrent(p){
   cfg.slots.forEach((s,i)=>{
     const tr=document.createElement('tr');
     if(rows[i] && rows[i]===cfg.me) tr.className='mine';
-    tr.innerHTML='<td class="place">'+slotLabel(i)+'</td>'+
+    tr.innerHTML='<td class="place">'+slotLabel(i)+
+      (s.task?'<span class="task">'+esc(s.task)+'</span>':'')+'</td>'+
       '<td class="name">'+(rows[i]||'<span class="vacant">空き</span>')+
       (s.gomi?'<span class="tag gomi">ゴミ収集</span>':'')+'</td>';
     tb.appendChild(tr);
@@ -534,8 +538,8 @@ function renderSettings(){
   cfg.slots.forEach((s,i)=>{
     const row=document.createElement('div'); row.className='setrow';
     row.innerHTML=
-      '<input type="text" value="'+esc(s.place)+'" data-si="'+i+'" placeholder="場所名">'+
-      '<label class="chk"><input type="checkbox" data-gi="'+i+'" '+(s.gomi?'checked':'')+'>ゴミ</label>'+
+      '<input type="text" value="'+esc(s.place)+'" data-si="'+i+'" placeholder="場所名" style="max-width:110px">'+
+      '<input type="text" value="'+esc(s.task||'')+'" data-st="'+i+'" placeholder="やること">'+
       '<button class="mini" data-up="'+i+'" title="上へ">↑</button>'+
       '<button class="mini" data-del="'+i+'" title="削除">×</button>';
     sl.appendChild(row);
@@ -573,6 +577,7 @@ function renderSettings(){
 document.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset.si!==undefined) cfg.slots[+t.dataset.si].place=t.value;
+  if(t.dataset.st!==undefined) cfg.slots[+t.dataset.st].task=t.value;
   if(t.dataset.mi!==undefined) cfg.members[+t.dataset.mi]=t.value;
   if(t.dataset.fp!==undefined) cfg.fixed[+t.dataset.fp].place=t.value;
   if(t.dataset.fn!==undefined) cfg.fixed[+t.dataset.fn].names=
