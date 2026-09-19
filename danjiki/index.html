@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2b6cb0">
+<meta name="description" content="16時間断食のタイマーと、甘いものを食べたくなったときのクールダウン。がまんできた分が目に見えてたまっていくアプリです。">
+<title>からだリセット — 16時間断食と甘いものクールダウン</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<style>
+  :root{
+    --paper:#eef1f5; --card:#ffffff; --card-2:#f5f7fa;
+    --ink:#1b2430; --ink-soft:#4a5765; --muted:#7c8899;
+    --line:#d8dee7; --line-soft:#eaeef3;
+
+    --green:#1f7a5a; --green-bg:#e4f4ec; --green-ink:#14573f;
+    --amber:#c97a14; --amber-bg:#fdf0da; --amber-ink:#8a5209;
+    --orange:#c4552d; --orange-bg:#fbe7df; --orange-ink:#8c3a1d;
+    --blue:#2b6cb0; --blue-bg:#e3eefb; --blue-ink:#1c4d80;
+    --purple:#6b46c1; --purple-bg:#ece5fa; --purple-ink:#4c2f91;
+    --red:#b3392a; --red-bg:#fbe4e1;
+
+    --green-solid:#1f7a5a; --blue-solid:#2b6cb0; --solid-fg:#ffffff;
+
+    --gothic:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",system-ui,sans-serif;
+    --shadow:0 1px 2px rgba(27,36,48,.06), 0 6px 18px rgba(27,36,48,.07);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14181d; --card:#1e242c; --card-2:#252c35;
+      --ink:#f0f3f7; --ink-soft:#c0c9d4; --muted:#8b95a3;
+      --line:#38414d; --line-soft:#2b323b;
+      --green:#4cc08f; --green-bg:#17362a; --green-ink:#8fe0bd;
+      --amber:#e0a33f; --amber-bg:#3a2d14; --amber-ink:#f2c777;
+      --orange:#e8825a; --orange-bg:#3b2419; --orange-ink:#f4a884;
+      --blue:#6aa9e8; --blue-bg:#1a2a3d; --blue-ink:#a8cdf2;
+      --purple:#a78bfa; --purple-bg:#2a2340; --purple-ink:#c9b6fd;
+      --red:#e0705e; --red-bg:#3a1f1b;
+      --green-solid:#1d5c45; --blue-solid:#28517e; --solid-fg:#eef5ff;
+      --shadow:0 1px 2px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14181d; --card:#1e242c; --card-2:#252c35;
+    --ink:#f0f3f7; --ink-soft:#c0c9d4; --muted:#8b95a3;
+    --line:#38414d; --line-soft:#2b323b;
+    --green:#4cc08f; --green-bg:#17362a; --green-ink:#8fe0bd;
+    --amber:#e0a33f; --amber-bg:#3a2d14; --amber-ink:#f2c777;
+    --orange:#e8825a; --orange-bg:#3b2419; --orange-ink:#f4a884;
+    --blue:#6aa9e8; --blue-bg:#1a2a3d; --blue-ink:#a8cdf2;
+    --purple:#a78bfa; --purple-bg:#2a2340; --purple-ink:#c9b6fd;
+    --red:#e0705e; --red-bg:#3a1f1b;
+    --green-solid:#1d5c45; --blue-solid:#28517e; --solid-fg:#eef5ff;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.3);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--gothic); font-size:18px; line-height:1.7;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:560px; margin:0 auto; padding:0 16px 120px}
+
+  header{padding:22px 0 8px; text-align:center}
+  header h1{font-size:26px; margin:0 0 4px; letter-spacing:.02em}
+  header p{margin:0; color:var(--muted); font-size:15px}
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:18px;
+    padding:20px; margin:16px 0; box-shadow:var(--shadow);
+  }
+  .card h2{font-size:21px; margin:0 0 6px; display:flex; align-items:center; gap:8px}
+  .lead{color:var(--ink-soft); font-size:15px; margin:0 0 14px}
+
+  /* ボタン */
+  .btn{
+    display:block; width:100%; border:none; border-radius:14px;
+    font-family:inherit; font-size:20px; font-weight:700; padding:18px 16px;
+    cursor:pointer; margin-top:10px; line-height:1.4;
+  }
+  .btn-blue{background:var(--blue-solid); color:var(--solid-fg)}
+  .btn-green{background:var(--green-solid); color:var(--solid-fg)}
+  .btn-sub{background:var(--card-2); color:var(--ink); border:2px solid var(--line); font-size:17px; padding:14px}
+  .btn small{display:block; font-size:14px; font-weight:400; opacity:.85; margin-top:2px}
+  .btn:active{transform:translateY(1px)}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .row2 .btn{margin-top:0}
+
+  /* タブ */
+  nav.tabs{
+    position:fixed; left:0; right:0; bottom:0; z-index:20;
+    background:var(--card); border-top:1px solid var(--line);
+    display:flex; padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+  }
+  nav.tabs button{
+    flex:1; background:none; border:none; font-family:inherit; cursor:pointer;
+    color:var(--muted); font-size:13px; font-weight:700; padding:8px 2px; border-radius:12px;
+  }
+  nav.tabs button .ic{display:block; font-size:24px; line-height:1.2}
+  nav.tabs button[aria-selected="true"]{color:var(--blue); background:var(--blue-bg)}
+
+  /* 断食リング */
+  .ring-wrap{display:flex; justify-content:center; margin:6px 0 4px}
+  .ring{position:relative; width:250px; height:250px}
+  .ring svg{transform:rotate(-90deg)}
+  .ring-center{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+  }
+  .ring-big{font-size:46px; font-weight:800; line-height:1.1; font-variant-numeric:tabular-nums}
+  .ring-sub{font-size:15px; color:var(--ink-soft)}
+  .ring-label{font-size:13px; color:var(--muted); letter-spacing:.08em}
+
+  .stage{
+    border-radius:14px; padding:14px 16px; margin-top:14px;
+    background:var(--blue-bg); border:1px solid var(--line-soft);
+  }
+  .stage b{font-size:19px; display:block}
+  .stage span{font-size:15px; color:var(--ink-soft)}
+
+  .steps{list-style:none; margin:14px 0 0; padding:0}
+  .steps li{
+    display:flex; gap:12px; align-items:flex-start;
+    padding:10px 12px; border-radius:12px; margin-bottom:6px;
+    background:var(--card-2); border:1px solid var(--line-soft);
+    font-size:15px; color:var(--muted);
+  }
+  .steps li .h{font-weight:800; min-width:56px; font-variant-numeric:tabular-nums}
+  .steps li.done{background:var(--green-bg); color:var(--green-ink); border-color:transparent}
+  .steps li.now{background:var(--amber-bg); color:var(--amber-ink); border-color:var(--amber); font-weight:700}
+
+  /* 数字カード */
+  .stats{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px}
+  .stat{
+    background:var(--card-2); border:1px solid var(--line-soft);
+    border-radius:14px; padding:14px; text-align:center;
+  }
+  .stat .n{font-size:32px; font-weight:800; line-height:1.2; font-variant-numeric:tabular-nums}
+  .stat .t{font-size:13px; color:var(--muted)}
+  .stat .u{font-size:15px; font-weight:700}
+  .stat.g{background:var(--green-bg)} .stat.g .n{color:var(--green-ink)}
+  .stat.b{background:var(--blue-bg)} .stat.b .n{color:var(--blue-ink)}
+  .stat.p{background:var(--purple-bg)} .stat.p .n{color:var(--purple-ink)}
+  .stat.a{background:var(--amber-bg)} .stat.a .n{color:var(--amber-ink)}
+
+  /* カレンダー */
+  .week{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:12px}
+  .day{text-align:center; font-size:12px; color:var(--muted)}
+  .day .mark{
+    margin-top:4px; height:44px; border-radius:11px; display:flex;
+    align-items:center; justify-content:center; font-size:20px;
+    background:var(--card-2); border:1px solid var(--line-soft);
+  }
+  .day .mark.ok{background:var(--green-bg); border-color:transparent}
+  .day .mark.mid{background:var(--amber-bg); border-color:transparent}
+  .day .mark.today{outline:3px solid var(--blue); outline-offset:1px}
+
+  /* グラフ */
+  .bars{display:flex; align-items:flex-end; gap:8px; height:130px; margin-top:12px}
+  .bars .b{flex:1; display:flex; flex-direction:column; justify-content:flex-end; height:100%}
+  .bars .b i{display:block; background:var(--blue); border-radius:6px 6px 0 0; min-height:4px}
+  .bars .b i.ok{background:var(--green)}
+  .bars .b em{font-style:normal; font-size:11px; color:var(--muted); text-align:center; margin-top:4px}
+  .bars .b u{text-decoration:none; font-size:12px; font-weight:700; text-align:center; color:var(--ink-soft)}
+
+  /* クールダウン */
+  .countdown{text-align:center; padding:8px 0}
+  .countdown .t{font-size:58px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1.1; color:var(--amber-ink)}
+  .countdown .msg{font-size:17px; color:var(--ink-soft); margin-top:8px; min-height:3.4em}
+
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 2px}
+  .chip{
+    background:var(--card-2); border:2px solid var(--line); color:var(--ink);
+    border-radius:999px; padding:8px 14px; font-size:16px; font-family:inherit; cursor:pointer;
+  }
+  .chip[aria-pressed="true"]{background:var(--blue-bg); border-color:var(--blue); color:var(--blue-ink); font-weight:700}
+
+  .note{
+    background:var(--card-2); border-left:5px solid var(--blue);
+    border-radius:0 12px 12px 0; padding:12px 14px; font-size:15px;
+    color:var(--ink-soft); margin-top:12px;
+  }
+  .note b{color:var(--ink)}
+
+  .list{margin-top:10px}
+  .item{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:12px 14px; border-radius:12px; background:var(--card-2);
+    border:1px solid var(--line-soft); margin-bottom:8px; font-size:15px;
+  }
+  .item .l{display:flex; gap:10px; align-items:center}
+  .item .ic{font-size:22px}
+  .item .when{color:var(--muted); font-size:13px}
+  .badge{font-size:13px; font-weight:700; padding:4px 10px; border-radius:999px}
+  .badge.ok{background:var(--green-bg); color:var(--green-ink)}
+  .badge.ng{background:var(--amber-bg); color:var(--amber-ink)}
+
+  input[type="time"], input[type="number"], input[type="date"]{
+    font-family:inherit; font-size:18px; padding:12px; border-radius:12px;
+    border:2px solid var(--line); background:var(--card-2); color:var(--ink); width:100%;
+  }
+  label.f{display:block; font-size:15px; font-weight:700; margin:12px 0 4px}
+
+  .cheer{
+    text-align:center; font-size:18px; font-weight:700; color:var(--green-ink);
+    background:var(--green-bg); border-radius:14px; padding:14px; margin-top:14px;
+  }
+  .hidden{display:none !important}
+  footer{text-align:center; color:var(--muted); font-size:13px; padding:10px 0 0}
+  .linkbtn{background:none;border:none;color:var(--blue);font-family:inherit;font-size:14px;cursor:pointer;text-decoration:underline;padding:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>からだリセット</h1>
+  <p>16時間断食 と 甘いものクールダウン</p>
+</header>
+
+<!-- ===================== 断食タブ ===================== -->
+<section id="tab-fast">
+
+  <div class="card">
+    <h2>⏳ 断食タイマー</h2>
+    <p class="lead" id="fastLead">最後に食べ終わった時間を押すと、16時間のカウントが始まります。</p>
+
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg width="250" height="250" viewBox="0 0 250 250">
+          <circle cx="125" cy="125" r="108" fill="none" stroke="var(--line)" stroke-width="18"/>
+          <circle id="ringArc" cx="125" cy="125" r="108" fill="none" stroke="var(--blue)"
+                  stroke-width="18" stroke-linecap="round"
+                  stroke-dasharray="678.6" stroke-dashoffset="678.6"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-label" id="ringLabel">まだ始まっていません</div>
+          <div class="ring-big" id="ringBig">--:--</div>
+          <div class="ring-sub" id="ringSub">下のボタンで開始</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage" id="stageBox">
+      <b id="stageTitle">準備中</b>
+      <span id="stageText">「いま食べ終わった」を押すとスタートします。</span>
+    </div>
+
+    <div id="fastIdle">
+      <button class="btn btn-blue" id="btnStartNow">いま食べ終わった<small>ここから16時間、水やお茶だけで過ごします</small></button>
+      <button class="btn btn-sub" id="btnStartPast">さっき食べ終わった（時間を入れる）</button>
+      <div id="pastBox" class="hidden">
+        <label class="f">食べ終わった時間</label>
+        <input type="time" id="pastTime">
+        <button class="btn btn-blue" id="btnStartPastGo">この時間で始める</button>
+      </div>
+    </div>
+
+    <div id="fastRunning" class="hidden">
+      <button class="btn btn-green" id="btnEatNow">食事を再開する（断食おわり）<small>16時間たっていなくても記録は残ります</small></button>
+      <button class="btn btn-sub" id="btnCancel">まちがえた・やり直す</button>
+    </div>
+
+    <ul class="steps" id="steps"></ul>
+
+    <div class="note">
+      <b>16時間断食とは？</b><br>
+      1日のうち16時間は食べず、残りの8時間の中で食事をとる方法です。
+      たとえば <b>夜20時に食べ終わって、翌日12時に昼ごはん</b> なら、ちょうど16時間。
+      寝ている時間が半分以上を占めるので、慣れると思ったよりつらくありません。<br>
+      ※水・お茶・ブラックコーヒーはOK。体調が悪い日や、持病・お薬がある方は無理をせず主治医にご相談ください。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🔥 今週の断食</h2>
+    <p class="lead">色がつくほど、続けられている証拠です。</p>
+    <div class="week" id="weekFast"></div>
+    <div class="stats" style="margin-top:14px">
+      <div class="stat g"><div class="n" id="stFastStreak">0</div><div class="t">連続達成日数</div></div>
+      <div class="stat b"><div class="n" id="stFastTotal">0</div><div class="t">達成した合計日数</div></div>
+    </div>
+    <div class="cheer" id="fastCheer">まずは1日、やってみましょう。</div>
+  </div>
+</section>
+
+<!-- ===================== がまんタブ ===================== -->
+<section id="tab-sweet" class="hidden">
+
+  <div class="card" id="cravingIdle">
+    <h2>🍰 甘いものが食べたい</h2>
+    <p class="lead">
+      食べたい気持ちのピークは、たいてい<b>10分ほどで落ち着きます</b>。
+      まず10分だけ、あずけてみませんか。
+    </p>
+    <div class="chips" id="tagChips">
+      <button class="chip" data-tag="チョコ・お菓子">チョコ・お菓子</button>
+      <button class="chip" data-tag="ケーキ・菓子パン">ケーキ・菓子パン</button>
+      <button class="chip" data-tag="アイス">アイス</button>
+      <button class="chip" data-tag="ジュース">ジュース</button>
+      <button class="chip" data-tag="ごはんのおかわり">おかわり・ドカ食い</button>
+      <button class="chip" data-tag="そのほか">そのほか</button>
+    </div>
+    <button class="btn btn-blue" id="btnCool">10分だけ待ってみる<small>タイマーが終わったら、食べるか決めます</small></button>
+    <button class="btn btn-sub" id="btnAteNow">もう食べた（正直に記録する）</button>
+  </div>
+
+  <div class="card hidden" id="cravingRunning">
+    <h2>🌊 ひと息つきましょう</h2>
+    <div class="countdown">
+      <div class="t" id="cdTime">10:00</div>
+      <div class="msg" id="cdMsg"></div>
+    </div>
+    <button class="btn btn-green" id="btnResisted">気持ちが落ち着いた・やめておく</button>
+    <button class="btn btn-sub" id="btnAte">やっぱり食べる</button>
+    <div class="note">
+      <b>待っている間におすすめ</b><br>
+      コップ1杯の水を飲む／歯をみがく／外の空気を吸う／ここまでためた「がまん貯金」を見る。
+      のどの渇きを空腹とまちがえていることも、けっこうあります。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🏆 がまん貯金</h2>
+    <p class="lead">やめておけた回数が、そのまま数字になってたまります。</p>
+    <div class="stats">
+      <div class="stat g"><div class="n" id="stWin">0</div><div class="t">やめておけた回数</div></div>
+      <div class="stat b"><div class="n" id="stKcal">0</div><div class="t">減らせたカロリー（kcal）</div></div>
+      <div class="stat p"><div class="n" id="stSugar">0</div><div class="t">減らせた砂糖（スティック本）</div></div>
+      <div class="stat a"><div class="n" id="stYen">0</div><div class="t">うかせたお金（円）</div></div>
+    </div>
+    <div class="note">
+      1回がまん＝おかし約200kcal・砂糖15g（スティックシュガー5本）・150円 として計算しています。
+      おおよその目安です。
+    </div>
+    <div class="cheer" id="sweetCheer">はじめの1回が、いちばん効きます。</div>
+  </div>
+
+  <div class="card">
+    <h2>📋 さいきんの記録</h2>
+    <p class="lead">食べた日があっても大丈夫。続いていることが大事です。</p>
+    <div class="list" id="cravingList"></div>
+  </div>
+</section>
+
+<!-- ===================== 記録タブ ===================== -->
+<section id="tab-log" class="hidden">
+
+  <div class="card">
+    <h2>📈 この7日間</h2>
+    <p class="lead">青い棒が断食できた時間。16時間に届くと緑になります。</p>
+    <div class="bars" id="bars"></div>
+    <p class="lead hidden" id="barsEmpty" style="margin-top:12px">
+      まだ記録がありません。「断食」タブで1回終えると、ここに棒が立ちます。
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>⚖️ 体重</h2>
+    <p class="lead">毎日でなくて大丈夫。朝いちばん、同じ条件ではかると比べやすいです。</p>
+    <label class="f">今日の体重（kg）</label>
+    <input type="number" id="wInput" step="0.1" inputmode="decimal" placeholder="例：58.4">
+    <button class="btn btn-blue" id="btnWeight">記録する</button>
+    <div id="weightArea"></div>
+  </div>
+
+  <div class="card">
+    <h2>🎖️ ごほうびバッジ</h2>
+    <p class="lead">続けるほど増えていきます。</p>
+    <div id="badges" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+  </div>
+
+  <div class="card">
+    <h2>⚙️ 設定</h2>
+    <label class="f">断食の目標時間</label>
+    <input type="number" id="goalInput" min="12" max="20" step="1">
+    <button class="btn btn-sub" id="btnGoal">この時間にする</button>
+    <p class="lead" style="margin-top:14px">
+      記録はこの端末の中だけに保存されます。どこにも送られません。
+    </p>
+    <button class="linkbtn" id="btnReset">すべての記録を消す</button>
+  </div>
+
+  <footer>からだリセット — つくった記録は端末内に保存されます</footer>
+</section>
+
+</div>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="fast" aria-selected="true"><span class="ic">⏳</span>断食</button>
+  <button role="tab" data-tab="sweet" aria-selected="false"><span class="ic">🍰</span>がまん</button>
+  <button role="tab" data-tab="log" aria-selected="false"><span class="ic">📈</span>記録</button>
+</nav>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- 保存まわり ----------
+  var KEY = "karada-reset-v1";
+  var KCAL = 200, SUGAR_STICK = 5, YEN = 150; // がまん1回ぶんの目安
+  var COOL_MIN = 10;
+
+  var S = load();
+  function load(){
+    var d = { goal:16, fastStart:null, fasts:[], cravings:[], craving:null, weights:[] };
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ var o = JSON.parse(raw); for(var k in d){ if(o[k]!==undefined) d[k]=o[k]; } }
+    }catch(e){}
+    return d;
+  }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+  // ---------- 日付ヘルパー ----------
+  function ymd(t){ var d = new Date(t); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+  function pad(n){ return (n<10?"0":"")+n; }
+  function todayKey(){ return ymd(Date.now()); }
+  function hhmm(t){ var d=new Date(t); return pad(d.getHours())+":"+pad(d.getMinutes()); }
+
+  // ---------- 断食の段階 ----------
+  var STAGES = [
+    {h:0,  title:"消化の時間",         text:"食べたものを消化しています。まだ体は「食事モード」です。", color:"var(--blue-bg)"},
+    {h:4,  title:"血糖が落ち着く時間", text:"血糖値が下がってきました。眠気やだるさが引いてくるころです。", color:"var(--blue-bg)"},
+    {h:8,  title:"脂肪を使いはじめる", text:"体にためた糖を使い切り、脂肪をエネルギーに切り替えはじめます。", color:"var(--amber-bg)"},
+    {h:12, title:"脂肪燃焼モード",     text:"ここからが本番。脂肪がしっかり使われる時間帯です。", color:"var(--amber-bg)"},
+    {h:16, title:"16時間達成！",       text:"おつかれさまでした。ゆっくり、消化のよいものから食べましょう。", color:"var(--green-bg)"}
+  ];
+
+  var COOL_MSGS = [
+    "いま感じているのは「本当の空腹」でしょうか。まずは水をひと口。",
+    "食べたい波は、上がって、そして必ず下がります。もう少しだけ。",
+    "10分後の自分は「待ってよかった」と思うはずです。",
+    "がまんではなく「今はやめておく」。それだけで十分です。",
+    "ここで一度立ち上がって、体を伸ばしてみましょう。",
+    "あと少し。今日のあなたは、もう十分よくやっています。"
+  ];
+
+  // ---------- 要素 ----------
+  var $ = function(id){ return document.getElementById(id); };
+
+  // ---------- タブ ----------
+  var tabBtns = document.querySelectorAll('nav.tabs button');
+  Array.prototype.forEach.call(tabBtns, function(b){
+    b.addEventListener('click', function(){
+      Array.prototype.forEach.call(tabBtns, function(x){ x.setAttribute('aria-selected', x===b ? 'true':'false'); });
+      ['fast','sweet','log'].forEach(function(n){
+        $('tab-'+n).classList.toggle('hidden', n !== b.dataset.tab);
+      });
+      window.scrollTo(0,0);
+      render();
+    });
+  });
+
+  // ================= 断食 =================
+  function goalMs(){ return S.goal*3600*1000; }
+
+  $('btnStartNow').addEventListener('click', function(){ startFast(Date.now()); });
+  $('btnStartPast').addEventListener('click', function(){
+    var box = $('pastBox'); box.classList.toggle('hidden');
+    if(!box.classList.contains('hidden')) $('pastTime').value = hhmm(Date.now());
+  });
+  $('btnStartPastGo').addEventListener('click', function(){
+    var v = $('pastTime').value; if(!v){ return; }
+    var p = v.split(':'); var d = new Date();
+    d.setHours(+p[0], +p[1], 0, 0);
+    if(d.getTime() > Date.now()) d.setDate(d.getDate()-1); // 未来なら前日ぶん
+    startFast(d.getTime());
+    $('pastBox').classList.add('hidden');
+  });
+  function startFast(t){ S.fastStart = t; save(); render(); }
+
+  $('btnCancel').addEventListener('click', function(){
+    if(confirm('いまのカウントを取り消しますか？（記録は残りません）')){ S.fastStart=null; save(); render(); }
+  });
+  $('btnEatNow').addEventListener('click', function(){
+    var end = Date.now();
+    var hours = (end - S.fastStart)/3600000;
+    S.fasts.push({ start:S.fastStart, end:end, hours:Math.round(hours*10)/10, date:ymd(end) });
+    S.fastStart = null; save(); render();
+    if(hours >= S.goal) alert('🎉 '+S.goal+'時間、達成です！\nよくがんばりました。');
+    else alert('おつかれさまでした。\n今回は '+(Math.round(hours*10)/10)+' 時間でした。記録に残しておきます。');
+  });
+
+  function renderFast(){
+    var running = !!S.fastStart;
+    $('fastIdle').classList.toggle('hidden', running);
+    $('fastRunning').classList.toggle('hidden', !running);
+
+    var elapsed = running ? (Date.now() - S.fastStart) : 0;
+    var hoursNow = elapsed/3600000;
+    var pct = Math.max(0, Math.min(1, elapsed/goalMs()));
+    var C = 2*Math.PI*108;
+    var arc = $('ringArc');
+    arc.setAttribute('stroke-dashoffset', String(C*(1-pct)));
+    arc.setAttribute('stroke', pct>=1 ? 'var(--green)' : (hoursNow>=8 ? 'var(--amber)' : 'var(--blue)'));
+
+    if(running){
+      var left = goalMs() - elapsed;
+      $('ringLabel').textContent = pct>=1 ? 'もくひょう達成' : '目標まで あと';
+      if(left > 0){
+        var h = Math.floor(left/3600000), m = Math.floor((left%3600000)/60000);
+        $('ringBig').textContent = h+"時間"+pad(m)+"分";
+      }else{
+        $('ringBig').textContent = "達成 🎉";
+      }
+      $('ringSub').textContent = "経過 "+(Math.floor(hoursNow))+"時間"+pad(Math.floor((elapsed%3600000)/60000))+"分 ／ "+hhmm(S.fastStart)+"から";
+      $('fastLead').textContent = "水・お茶・ブラックコーヒーはOKです。";
+    }else{
+      $('ringLabel').textContent = 'まだ始まっていません';
+      $('ringBig').textContent = S.goal+"時間";
+      $('ringSub').textContent = '下のボタンで開始';
+      $('fastLead').textContent = '最後に食べ終わった時間を押すと、'+S.goal+'時間のカウントが始まります。';
+    }
+
+    // 段階
+    var cur = STAGES[0], idx = 0;
+    for(var i=0;i<STAGES.length;i++){ if(hoursNow >= STAGES[i].h){ cur = STAGES[i]; idx = i; } }
+    if(!running){ $('stageTitle').textContent = '準備中'; $('stageText').textContent = '「いま食べ終わった」を押すとスタートします。'; $('stageBox').style.background='var(--card-2)'; }
+    else { $('stageTitle').textContent = cur.title; $('stageText').textContent = cur.text; $('stageBox').style.background = cur.color; }
+
+    // ステップ一覧
+    var html = '';
+    for(var j=0;j<STAGES.length;j++){
+      var st = STAGES[j];
+      var cls = !running ? '' : (j < idx ? 'done' : (j === idx ? 'now' : ''));
+      html += '<li class="'+cls+'"><span class="h">'+st.h+'時間</span><span>'+st.title+
+              (cls==='now' ? '　←いまここ' : (cls==='done' ? '　✓' : ''))+'</span></li>';
+    }
+    $('steps').innerHTML = html;
+
+    // 今週カレンダー
+    var week = '', names = ['日','月','火','水','木','金','土'];
+    var base = new Date(); base.setHours(0,0,0,0);
+    for(var d=6; d>=0; d--){
+      var day = new Date(base.getTime() - d*86400000);
+      var key = ymd(day.getTime());
+      var best = 0;
+      S.fasts.forEach(function(f){ if(f.date===key && f.hours>best) best=f.hours; });
+      var mk = best >= S.goal ? 'ok' : (best >= 12 ? 'mid' : '');
+      var icon = best >= S.goal ? '🔥' : (best >= 12 ? '◎' : (best>0 ? '·' : ''));
+      week += '<div class="day">'+names[day.getDay()]+
+              '<div class="mark '+mk+(d===0?' today':'')+'">'+icon+'</div></div>';
+    }
+    $('weekFast').innerHTML = week;
+
+    $('stFastStreak').textContent = streak();
+    $('stFastTotal').textContent = S.fasts.filter(function(f){ return f.hours >= S.goal; }).length;
+
+    var s = streak();
+    $('fastCheer').textContent =
+      s >= 7 ? '🔥 '+s+'日連続！ 習慣になってきましたね。' :
+      s >= 3 ? '👏 '+s+'日連続。いちばん大変な時期を越えつつあります。' :
+      s >= 1 ? '✨ '+s+'日連続。今日もこの調子で。' :
+               'まずは1日、やってみましょう。';
+  }
+
+  function streak(){
+    var days = {};
+    S.fasts.forEach(function(f){ if(f.hours >= S.goal) days[f.date]=true; });
+    var n=0, d=new Date(); d.setHours(0,0,0,0);
+    if(!days[ymd(d.getTime())]) d = new Date(d.getTime()-86400000); // 今日まだでも昨日から数える
+    while(days[ymd(d.getTime())]){ n++; d = new Date(d.getTime()-86400000); }
+    return n;
+  }
+
+  // ================= 甘いもの =================
+  var selTag = 'そのほか';
+  Array.prototype.forEach.call(document.querySelectorAll('#tagChips .chip'), function(c){
+    c.addEventListener('click', function(){
+      Array.prototype.forEach.call(document.querySelectorAll('#tagChips .chip'), function(x){ x.setAttribute('aria-pressed','false'); });
+      c.setAttribute('aria-pressed','true'); selTag = c.dataset.tag;
+    });
+  });
+
+  $('btnCool').addEventListener('click', function(){
+    S.craving = { start:Date.now(), endsAt: Date.now()+COOL_MIN*60000, tag:selTag };
+    save(); render();
+  });
+  $('btnAteNow').addEventListener('click', function(){ logCraving('ate', selTag); });
+  $('btnResisted').addEventListener('click', function(){
+    var tag = S.craving ? S.craving.tag : selTag;
+    S.craving = null; logCraving('win', tag);
+    alert('🏆 よくやりました！\nがまん貯金がたまりました。');
+  });
+  $('btnAte').addEventListener('click', function(){
+    var tag = S.craving ? S.craving.tag : selTag;
+    S.craving = null; logCraving('ate', tag);
+  });
+  function logCraving(result, tag){
+    S.cravings.unshift({ t:Date.now(), result:result, tag:tag });
+    if(S.cravings.length > 200) S.cravings.length = 200;
+    save(); render();
+  }
+
+  function renderSweet(){
+    var run = !!(S.craving);
+    $('cravingIdle').classList.toggle('hidden', run);
+    $('cravingRunning').classList.toggle('hidden', !run);
+
+    if(run){
+      var left = S.craving.endsAt - Date.now();
+      if(left < 0) left = 0;
+      var m = Math.floor(left/60000), s = Math.floor((left%60000)/1000);
+      $('cdTime').textContent = m+":"+pad(s);
+      var idx = Math.min(COOL_MSGS.length-1, Math.floor((COOL_MIN*60000-left)/(COOL_MIN*60000/COOL_MSGS.length)));
+      $('cdMsg').textContent = left===0 ? '⏰ 10分たちました。いまの気持ちはどうですか？' : COOL_MSGS[idx];
+      $('cdTime').style.color = left===0 ? 'var(--green-ink)' : 'var(--amber-ink)';
+    }
+
+    var wins = S.cravings.filter(function(c){ return c.result==='win'; }).length;
+    $('stWin').textContent = wins;
+    $('stKcal').textContent = (wins*KCAL).toLocaleString('ja-JP');
+    $('stSugar').textContent = wins*SUGAR_STICK;
+    $('stYen').textContent = (wins*YEN).toLocaleString('ja-JP');
+
+    $('sweetCheer').textContent =
+      wins >= 30 ? '🏅 '+wins+'回！ ごはん約'+Math.round(wins*KCAL/600)+'食ぶんのカロリーを手放しました。' :
+      wins >= 10 ? '💪 '+wins+'回やめておけました。体は確実に変わっています。' :
+      wins >= 1  ? '🌱 '+wins+'回。その積み重ねが効いてきます。' :
+                   'はじめの1回が、いちばん効きます。';
+
+    var list = '';
+    S.cravings.slice(0,12).forEach(function(c){
+      var ok = c.result==='win';
+      list += '<div class="item"><div class="l"><span class="ic">'+(ok?'🏆':'🍩')+'</span><div>'+
+              '<div>'+esc(c.tag)+'</div><div class="when">'+fmtWhen(c.t)+'</div></div></div>'+
+              '<span class="badge '+(ok?'ok':'ng')+'">'+(ok?'やめておけた':'食べた')+'</span></div>';
+    });
+    $('cravingList').innerHTML = list || '<p class="lead">まだ記録はありません。</p>';
+  }
+  function esc(s){ return String(s).replace(/[<>&]/g, function(c){ return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]; }); }
+  function fmtWhen(t){
+    var d = new Date(t), k = ymd(t);
+    var label = k===todayKey() ? '今日' : (k===ymd(Date.now()-86400000) ? '昨日' : (d.getMonth()+1)+'月'+d.getDate()+'日');
+    return label+' '+hhmm(t);
+  }
+
+  // ================= 記録 =================
+  $('btnWeight').addEventListener('click', function(){
+    var v = parseFloat($('wInput').value);
+    if(!v || v<20 || v>250){ alert('体重を数字で入れてください（例：58.4）'); return; }
+    S.weights = S.weights.filter(function(w){ return w.date !== todayKey(); });
+    S.weights.push({ date:todayKey(), kg:Math.round(v*10)/10 });
+    S.weights.sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+    $('wInput').value = ''; save(); render();
+  });
+  $('btnGoal').addEventListener('click', function(){
+    var v = parseInt($('goalInput').value,10);
+    if(!v || v<12 || v>20){ alert('12〜20の数字を入れてください。'); return; }
+    S.goal = v; save(); render(); alert('目標を '+v+' 時間にしました。');
+  });
+  $('btnReset').addEventListener('click', function(){
+    if(confirm('すべての記録を消します。よろしいですか？（元に戻せません）')){
+      S = { goal:16, fastStart:null, fasts:[], cravings:[], craving:null, weights:[] };
+      save(); render();
+    }
+  });
+
+  function renderLog(){
+    $('goalInput').value = S.goal;
+
+    // 7日棒グラフ
+    var bars = '', names=['日','月','火','水','木','金','土'];
+    var base = new Date(); base.setHours(0,0,0,0);
+    for(var d=6; d>=0; d--){
+      var day = new Date(base.getTime()-d*86400000), key = ymd(day.getTime());
+      var best = 0;
+      S.fasts.forEach(function(f){ if(f.date===key && f.hours>best) best=f.hours; });
+      var h = Math.round(Math.min(best,20)/20*100);
+      bars += '<div class="b"><u>'+(best?best+'h':'')+'</u><i class="'+(best>=S.goal?'ok':'')+'" style="height:'+h+'%"></i>'+
+              '<em>'+names[day.getDay()]+'</em></div>';
+    }
+    $('bars').innerHTML = bars;
+    var noFast = S.fasts.length === 0;
+    $('barsEmpty').classList.toggle('hidden', !noFast);
+    $('bars').classList.toggle('hidden', noFast);
+
+    // 体重
+    var w = S.weights.slice(-14);
+    if(w.length===0){ $('weightArea').innerHTML = '<p class="lead" style="margin-top:14px">まだ記録がありません。</p>'; }
+    else{
+      var first=w[0].kg, last=w[w.length-1].kg, diff=Math.round((last-first)*10)/10;
+      var max=Math.max.apply(null,w.map(function(x){return x.kg;}));
+      var min=Math.min.apply(null,w.map(function(x){return x.kg;}));
+      var span = Math.max(1, max-min);
+      var g = '<div class="bars" style="height:110px;margin-top:16px">';
+      w.forEach(function(x){
+        var hh = Math.round(((x.kg-min)/span*70)+30);
+        g += '<div class="b"><i style="height:'+hh+'%;background:var(--purple)"></i><em>'+(+x.date.slice(8))+'</em></div>';
+      });
+      g += '</div>';
+      g += '<div class="stats" style="margin-top:14px">'+
+           '<div class="stat p"><div class="n">'+last+'<span class="u">kg</span></div><div class="t">いちばん新しい記録</div></div>'+
+           '<div class="stat '+(diff<=0?'g':'a')+'"><div class="n">'+(diff>0?'+':'')+diff+'<span class="u">kg</span></div><div class="t">最初の記録からの変化</div></div></div>';
+      $('weightArea').innerHTML = g;
+    }
+
+    // バッジ
+    var wins = S.cravings.filter(function(c){ return c.result==='win'; }).length;
+    var done = S.fasts.filter(function(f){ return f.hours>=S.goal; }).length;
+    var defs = [
+      ['🌱','はじめの一歩', done>=1 || wins>=1],
+      ['🔥','断食3日達成',  done>=3],
+      ['🏅','断食10日達成', done>=10],
+      ['👑','断食30日達成', done>=30],
+      ['🍬','がまん5回',    wins>=5],
+      ['💎','がまん20回',   wins>=20],
+      ['⚡','3日連続',      streak()>=3],
+      ['🌟','7日連続',      streak()>=7]
+    ];
+    $('badges').innerHTML = defs.map(function(b){
+      var got = b[2];
+      return '<div style="flex:1 1 30%;text-align:center;padding:12px 6px;border-radius:14px;'+
+             'background:'+(got?'var(--amber-bg)':'var(--card-2)')+';border:1px solid var(--line-soft);'+
+             'opacity:'+(got?1:.45)+'"><div style="font-size:30px">'+(got?b[0]:'🔒')+'</div>'+
+             '<div style="font-size:12px;font-weight:700">'+b[1]+'</div></div>';
+    }).join('');
+  }
+
+  // ---------- 全体描画 ----------
+  function render(){ renderFast(); renderSweet(); renderLog(); }
+  render();
+  setInterval(render, 1000);
+
+})();
+</script>
+</body>
+</html>

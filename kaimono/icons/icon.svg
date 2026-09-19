@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="ひと呼吸">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3d8a83"/>
+      <stop offset="1" stop-color="#22544f"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- 買い物袋の持ち手 -->
+  <path d="M196 212v-26a60 60 0 0 1 120 0v26"
+        fill="none" stroke="#ffffff" stroke-width="22" stroke-linecap="round"/>
+
+  <!-- 買い物袋 -->
+  <rect x="120" y="200" width="272" height="216" rx="30" fill="#ffffff"/>
+
+  <!-- 砂時計（＝ひと呼吸おく時間） -->
+  <polygon points="200,248 312,248 256,308" fill="#2f6f6a"/>
+  <polygon points="256,308 312,368 200,368" fill="#e2a33c"/>
+  <rect x="190" y="236" width="132" height="16" rx="8" fill="#22544f"/>
+  <rect x="190" y="364" width="132" height="16" rx="8" fill="#22544f"/>
+</svg>

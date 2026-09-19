@@ -1,0 +1,82 @@
+{
+  "_comment": "情報源の一覧。kind が feed のものは RSS/Atom、site のものは専用パーサで取得します。enabled を false にすると取得しません。",
+
+  "sites": [
+    {
+      "id": "akaboo",
+      "name": "赤ブーブー通信社",
+      "kind": "site",
+      "parser": "akaboo",
+      "enabled": true,
+      "category": "doujin",
+      "urls": [
+        "https://www.akaboo.jp/event/",
+        "https://www.akaboo.jp/event/index2.html"
+      ],
+      "home": "https://www.akaboo.jp/"
+    },
+    {
+      "id": "ketto",
+      "name": "ケットコム",
+      "kind": "site",
+      "parser": "ketto",
+      "enabled": true,
+      "category": "doujin",
+      "urls": ["https://ketto.com/"],
+      "encoding": "cp932",
+      "home": "https://ketto.com/"
+    }
+  ],
+
+  "feeds": [
+    {
+      "id": "natalie-comic",
+      "name": "コミックナタリー",
+      "kind": "feed",
+      "enabled": true,
+      "url": "https://natalie.mu/comic/feed/news",
+      "weight": 1.0
+    },
+    {
+      "id": "animeanime",
+      "name": "アニメ！アニメ！",
+      "kind": "feed",
+      "enabled": true,
+      "url": "https://animeanime.jp/rss20/index.rdf",
+      "weight": 1.0
+    },
+    {
+      "id": "natalie-music",
+      "name": "音楽ナタリー",
+      "kind": "feed",
+      "enabled": true,
+      "url": "https://natalie.mu/music/feed/news",
+      "weight": 0.8
+    },
+    {
+      "id": "natalie-stage",
+      "name": "ステージナタリー",
+      "kind": "feed",
+      "enabled": true,
+      "url": "https://natalie.mu/stage/feed/news",
+      "weight": 0.8
+    },
+    {
+      "id": "otakuma",
+      "name": "おたくま経済新聞",
+      "kind": "feed",
+      "enabled": true,
+      "url": "https://otakuma.net/feed",
+      "weight": 0.8
+    },
+    {
+      "id": "prtimes",
+      "name": "PR TIMES",
+      "kind": "feed",
+      "enabled": true,
+      "url": "https://prtimes.jp/index.rdf",
+      "weight": 0.6,
+      "strict": true
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="オタクイベントまとめ">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9b5cff"/>
+      <stop offset="1" stop-color="#6229c9"/>
+    </linearGradient>
+    <linearGradient id="star" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe27a"/>
+      <stop offset="1" stop-color="#ffb01f"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- カレンダー本体 -->
+  <rect x="96" y="128" width="320" height="288" rx="34" fill="#ffffff"/>
+  <rect x="96" y="128" width="320" height="72" rx="34" fill="#ff5f9e"/>
+  <rect x="96" y="176" width="320" height="24" fill="#ff5f9e"/>
+
+  <!-- リング -->
+  <rect x="156" y="92" width="26" height="72" rx="13" fill="#3b1a6b"/>
+  <rect x="330" y="92" width="26" height="72" rx="13" fill="#3b1a6b"/>
+
+  <!-- 日付のドット -->
+  <g fill="#e3daf5">
+    <circle cx="160" cy="252" r="15"/>
+    <circle cx="224" cy="252" r="15"/>
+    <circle cx="352" cy="252" r="15"/>
+    <circle cx="160" cy="322" r="15"/>
+    <circle cx="352" cy="322" r="15"/>
+  </g>
+
+  <!-- 注目の日 -->
+  <circle cx="288" cy="252" r="24" fill="#ff5f9e" opacity="0.22"/>
+
+  <!-- 星 -->
+  <path d="M256 268l26.4 53.5 59 8.6-42.7 41.6 10.1 58.8L256 402.7l-52.8 27.8 10.1-58.8-42.7-41.6 59-8.6z"
+        fill="url(#star)" stroke="#e08a00" stroke-width="8" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#7b3fe4" />
+  <meta name="description" content="日本の同人イベント・アニメイベント・キャンペーン情報を自動で集めてまとめてチェックできるアプリ。" />
+  <title>オタクイベントまとめ</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <img src="icons/icon.svg" alt="" class="brand-logo" width="40" height="40" />
+      <div class="brand-text">
+        <h1>オタクイベントまとめ</h1>
+        <p class="brand-sub">同人・アニメ・キャンペーンを自動収集</p>
+      </div>
+    </div>
+    <button id="refreshBtn" class="icon-btn" type="button" title="最新の情報を取り込む" aria-label="更新">
+      <span aria-hidden="true">⟳</span>
+    </button>
+  </div>
+
+  <div class="search-row">
+    <input id="searchInput" class="search-input" type="search"
+           placeholder="キーワード検索（作品名・イベント名・会場）" autocomplete="off" enterkeyhint="search" />
+    <button id="clearSearch" class="clear-search" type="button" aria-label="検索をクリア" hidden>×</button>
+  </div>
+
+  <nav class="tabs" id="categoryTabs" role="tablist" aria-label="カテゴリ">
+    <button class="tab is-active" data-cat="all" role="tab" aria-selected="true">すべて</button>
+    <button class="tab" data-cat="doujin" role="tab" aria-selected="false">同人イベント</button>
+    <button class="tab" data-cat="anime_event" role="tab" aria-selected="false">アニメイベント</button>
+    <button class="tab" data-cat="campaign" role="tab" aria-selected="false">キャンペーン</button>
+    <button class="tab tab-fav" data-cat="fav" role="tab" aria-selected="false">★ 保存</button>
+  </nav>
+
+  <div class="filters">
+    <select id="periodSelect" class="select" aria-label="期間で絞り込み">
+      <option value="upcoming">これから開催</option>
+      <option value="today">今日</option>
+      <option value="weekend">今週末</option>
+      <option value="week">1週間以内</option>
+      <option value="month">今月</option>
+      <option value="next-month">来月</option>
+      <option value="all">期間を問わない</option>
+    </select>
+
+    <select id="areaSelect" class="select" aria-label="開催地で絞り込み">
+      <option value="all">全国</option>
+    </select>
+
+    <select id="sortSelect" class="select" aria-label="並び替え">
+      <option value="date">開催日が近い順</option>
+      <option value="deadline">申込締切が近い順</option>
+      <option value="new">新着順</option>
+    </select>
+
+    <label class="switch">
+      <input type="checkbox" id="deadlineOnly" />
+      <span>締切間近だけ</span>
+    </label>
+  </div>
+</header>
+
+<main class="app-main">
+  <div id="statusBar" class="status-bar">読み込み中…</div>
+
+  <div id="cardList" class="card-list" aria-live="polite"></div>
+
+  <div id="sentinel" class="sentinel" hidden></div>
+
+  <div id="emptyState" class="empty-state" hidden>
+    <p class="empty-emoji" aria-hidden="true">🔍</p>
+    <p>条件に合うイベントが見つかりませんでした。</p>
+    <button id="resetFilters" class="link-btn" type="button">絞り込みをリセット</button>
+  </div>
+
+  <footer class="app-footer">
+    <p id="updatedNote" class="updated-note"></p>
+    <details class="sources">
+      <summary>情報の取得元について</summary>
+      <p>
+        このアプリは、下記のサイトが公開している情報を自動でまとめて表示しています。
+        掲載内容は変更されることがあります。参加申込や来場の前に、必ずリンク先の公式ページで最新情報をご確認ください。
+      </p>
+      <ul id="sourceList"></ul>
+    </details>
+  </footer>
+</main>
+
+<!-- 詳細モーダル -->
+<div id="detailModal" class="modal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" type="button" data-close aria-label="閉じる">×</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

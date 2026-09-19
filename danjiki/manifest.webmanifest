@@ -1,0 +1,13 @@
+{
+  "name": "からだリセット — 16時間断食と甘いものクールダウン",
+  "short_name": "からだリセット",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef1f5",
+  "theme_color": "#2b6cb0",
+  "lang": "ja",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

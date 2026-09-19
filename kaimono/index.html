@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f7a5a">
+<meta name="description" content="欲しくなったものを一度あずけて、頭が冷えてから買うか決めるアプリ。やめた分は「がまん貯金」としてたまっていきます。">
+<title>ひと呼吸 — 買う前のクールダウン</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+  :root{
+    --paper:#eef1f5; --card:#ffffff; --card-2:#f5f7fa;
+    --ink:#1b2430; --ink-soft:#4a5765; --muted:#7c8899;
+    --line:#d8dee7; --line-soft:#eaeef3;
+
+    --green:#1f7a5a; --green-bg:#e4f4ec; --green-ink:#14573f;
+    --amber:#c97a14; --amber-bg:#fdf0da; --amber-ink:#8a5209;
+    /* ボタンなど「色で塗りつぶす場所」の色。暗い画面では濃い色に差し替える */
+    --green-solid:#1f7a5a; --green-solid-fg:#ffffff;
+    --amber-solid:#c97a14; --amber-solid-fg:#ffffff;
+    --orange:#c4552d; --orange-bg:#fbe7df; --orange-ink:#8c3a1d;
+    --blue:#2b6cb0; --blue-bg:#e3eefb;
+    --red:#b3392a;
+
+    --gothic:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",system-ui,sans-serif;
+    --shadow:0 1px 2px rgba(27,36,48,.06), 0 6px 18px rgba(27,36,48,.07);
+    --shadow-lg:0 4px 12px rgba(27,36,48,.1), 0 16px 40px rgba(27,36,48,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14181d; --card:#1e242c; --card-2:#252c35;
+      --ink:#f0f3f7; --ink-soft:#c0c9d4; --muted:#8b95a3;
+      --line:#38414d; --line-soft:#2b323b;
+
+      --green:#4cc08f; --green-bg:#17362a; --green-ink:#8fe0bd;
+      --amber:#e0a33f; --amber-bg:#3a2d14; --amber-ink:#f2c777;
+      --green-solid:#1d5c45; --green-solid-fg:#eafaf3;
+      --amber-solid:#a9761f; --amber-solid-fg:#fff8ea;
+      --orange:#e8825a; --orange-bg:#3b2419; --orange-ink:#f4a884;
+      --blue:#6aa9e8; --blue-bg:#1a2a3d;
+      --red:#e0705e;
+
+      --shadow:0 1px 2px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.3);
+      --shadow-lg:0 4px 12px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14181d; --card:#1e242c; --card-2:#252c35;
+    --ink:#f0f3f7; --ink-soft:#c0c9d4; --muted:#8b95a3;
+    --line:#38414d; --line-soft:#2b323b;
+
+    --green:#4cc08f; --green-bg:#17362a; --green-ink:#8fe0bd;
+    --amber:#e0a33f; --amber-bg:#3a2d14; --amber-ink:#f2c777;
+    --green-solid:#1d5c45; --green-solid-fg:#eafaf3;
+    --amber-solid:#a9761f; --amber-solid-fg:#fff8ea;
+    --orange:#e8825a; --orange-bg:#3b2419; --orange-ink:#f4a884;
+    --blue:#6aa9e8; --blue-bg:#1a2a3d;
+    --red:#e0705e;
+
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.3);
+    --shadow-lg:0 4px 12px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink); font-family:var(--gothic);
+    font-size:16px; line-height:1.8; -webkit-font-smoothing:antialiased;
+    padding-bottom:calc(110px + env(safe-area-inset-bottom));
+  }
+  button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
+  button{cursor:pointer}
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+  .wrap{max-width:600px;margin:0 auto;padding:0 14px}
+
+  /* ══ ヘッダー ══ */
+  header.top{padding:20px 0 4px}
+  .top-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;align-items:center;gap:11px;min-width:0}
+  .brand img{width:44px;height:44px;border-radius:12px;flex:none}
+  h1{font-size:23px;font-weight:800;letter-spacing:.04em;margin:0;line-height:1.3}
+  .tagline{font-size:13px;color:var(--ink-soft);margin:1px 0 0;font-weight:500}
+  .icon-btn{
+    width:46px;height:46px;flex:none;border-radius:14px;border:2px solid var(--line);
+    background:var(--card);color:var(--ink-soft);font-size:20px;line-height:1;
+    display:grid;place-items:center
+  }
+  .icon-btn:hover{border-color:var(--green);color:var(--green)}
+
+  /* ══ 貯金カード ══ */
+  .savings{
+    margin:16px 0 0;padding:16px 18px;border-radius:18px;
+    background:var(--green-solid);color:var(--green-solid-fg);box-shadow:var(--shadow-lg)
+  }
+  .savings .lbl{font-size:13px;font-weight:700;margin:0;opacity:.95;display:flex;align-items:center;gap:6px}
+  .savings .amt{font-size:40px;font-weight:800;margin:2px 0 0;line-height:1.15;letter-spacing:-.01em}
+  .savings .amt small{font-size:18px;font-weight:700;margin-left:3px}
+  .savings .side{font-size:13px;margin:4px 0 0;opacity:.95;font-weight:500}
+
+  /* 貯金カードの中の「目標」 */
+  .goal-mini{margin:13px 0 0;padding:12px 13px 11px;border-radius:14px;background:rgba(255,255,255,.16)}
+  .goal-mini .gt{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:14px;font-weight:800}
+  .goal-mini .gt small{font-size:12px;font-weight:700;opacity:.9;white-space:nowrap}
+  .goal-mini .gbar{height:12px;border-radius:999px;background:rgba(0,0,0,.22);overflow:hidden;margin-top:8px}
+  .goal-mini .gbar i{display:block;height:100%;background:#ffd66b;border-radius:999px;transition:width .4s}
+  .goal-mini .gs{font-size:12.5px;font-weight:700;margin:6px 0 0;opacity:.95}
+  .goal-mini.done .gbar i{background:#ffe9a3}
+  .goal-set{
+    margin:13px 0 0;width:100%;min-height:46px;border-radius:12px;border:2px dashed rgba(255,255,255,.5);
+    background:rgba(255,255,255,.12);color:inherit;font-size:14.5px;font-weight:800
+  }
+  .goal-done-btn{
+    margin:9px 0 0;width:100%;min-height:46px;border-radius:12px;border:none;
+    background:#ffd66b;color:#4a3708;font-size:15px;font-weight:800
+  }
+
+  /* ══ タブ ══ */
+  nav.tabs{
+    position:sticky;top:0;z-index:20;background:var(--paper);
+    padding:12px 0 8px;margin-top:14px;display:flex;gap:6px
+  }
+  nav.tabs::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--line)}
+  .tab{
+    flex:1;padding:8px 2px 10px;border:none;background:none;color:var(--muted);
+    font-size:13px;font-weight:700;border-bottom:4px solid transparent;border-radius:10px 10px 0 0;
+    display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.4;position:relative;z-index:1
+  }
+  .tab .ic{font-size:19px;line-height:1.2}
+  .tab[aria-selected="true"]{color:var(--green);border-bottom-color:var(--green);background:var(--green-bg)}
+  .badge{
+    position:absolute;top:2px;right:calc(50% - 30px);
+    min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--red);
+    color:#fff;font-size:12px;line-height:20px;font-weight:800
+  }
+  .badge[hidden]{display:none}
+
+  /* ══ 各タブの説明 ══ */
+  .view-note{
+    display:flex;gap:9px;align-items:flex-start;
+    background:var(--blue-bg);color:var(--ink-soft);border-radius:12px;
+    padding:11px 14px;margin:14px 0 4px;font-size:13.5px;line-height:1.7;font-weight:500
+  }
+  .view-note b{color:var(--ink)}
+
+  /* ══ カード ══ */
+  section.view[hidden]{display:none}
+  .item{
+    background:var(--card);border:2px solid var(--line);border-radius:18px;
+    padding:0;margin:14px 0;box-shadow:var(--shadow);overflow:hidden
+  }
+  .item-top{
+    display:flex;align-items:center;gap:8px;padding:9px 16px;
+    background:var(--card-2);border-bottom:2px solid var(--line-soft);
+    font-size:13px;font-weight:700;color:var(--ink-soft)
+  }
+  .item.ready{border-color:var(--amber)}
+  .item.ready .item-top{background:var(--amber-bg);color:var(--amber-ink);border-bottom-color:transparent}
+  .item-body{padding:14px 16px 16px}
+
+  .item .name{font-size:19px;font-weight:800;margin:0;word-break:break-word;line-height:1.5}
+  .price-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:8px 0 0}
+  .price{font-size:27px;font-weight:800;white-space:nowrap;letter-spacing:-.01em}
+  .price small{font-size:15px;font-weight:700;margin-left:1px}
+  .want-inline{font-size:14px;color:var(--amber);font-weight:700;white-space:nowrap}
+  .want-inline s{color:var(--line);text-decoration:none}
+
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+  .chip{
+    font-size:12.5px;font-weight:700;padding:3px 11px;border-radius:999px;
+    background:var(--line-soft);color:var(--ink-soft)
+  }
+  .chip.sign{background:var(--orange-bg);color:var(--orange-ink)}
+  .chip.need{background:var(--blue-bg);color:var(--blue)}
+  .chip.link{background:var(--blue-bg);color:var(--blue);text-decoration:none}
+
+  .quote{margin:12px 0 0;border:2px solid var(--line-soft);border-radius:12px;overflow:hidden}
+  .quote .qh{
+    background:var(--line-soft);padding:5px 12px;font-size:12px;font-weight:700;color:var(--ink-soft)
+  }
+  .quote p{margin:0;padding:10px 12px;font-size:14.5px;color:var(--ink-soft);
+           white-space:pre-wrap;word-break:break-word;line-height:1.8}
+
+  /* 残り時間 */
+  .timer{margin:14px 0 0;background:var(--card-2);border-radius:14px;padding:13px 14px}
+  .timer .big{font-size:15px;font-weight:700;color:var(--ink-soft);margin:0}
+  .timer .big b{font-size:27px;font-weight:800;color:var(--green);margin:0 3px}
+  .bar{height:12px;border-radius:999px;background:var(--line);overflow:hidden;margin-top:9px;border:1px solid var(--line)}
+  .bar i{display:block;height:100%;background:var(--green);border-radius:999px;transition:width .4s}
+  .bar.over i{background:var(--red)}
+  .bar-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:5px;font-weight:600}
+
+  /* ボタン */
+  .acts{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+  .btn{
+    width:100%;min-height:52px;padding:9px 14px;border-radius:14px;border:2px solid var(--line);
+    background:var(--card);color:var(--ink);font-size:16px;font-weight:700;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.4
+  }
+  .btn span{font-size:12px;font-weight:600;opacity:.85}
+  .btn:hover{border-color:var(--ink-soft)}
+  .btn.green{background:var(--green-solid);border-color:var(--green-solid);color:var(--green-solid-fg)}
+  .btn.amber{background:var(--amber-solid);border-color:var(--amber-solid);color:var(--amber-solid-fg)}
+  .btn.orange{background:var(--orange-bg);border-color:var(--orange);color:var(--orange-ink)}
+  .btn.small{min-height:44px;font-size:14px;font-weight:700}
+  .btn.plain{background:none;border-color:transparent;color:var(--muted);min-height:40px;font-size:13.5px}
+  .btn.plain:hover{color:var(--ink);border-color:var(--line)}
+  .btn-row{display:flex;gap:9px}
+  .btn-row .btn{flex:1}
+
+  /* からっぽ表示 */
+  .empty{
+    background:var(--card);border:2px dashed var(--line);border-radius:18px;
+    padding:30px 20px;margin:14px 0;text-align:center
+  }
+  .empty .ic{font-size:40px;line-height:1}
+  .empty .big{display:block;font-size:17px;font-weight:800;margin:8px 0 4px}
+  .empty p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.8}
+
+  /* つかいかた */
+  .howto{background:var(--card);border:2px solid var(--line);border-radius:18px;margin:14px 0;overflow:hidden}
+  .howto > summary{
+    padding:14px 16px;font-size:15px;font-weight:800;cursor:pointer;list-style:none;
+    display:flex;align-items:center;gap:8px
+  }
+  .howto > summary::-webkit-details-marker{display:none}
+  .howto > summary::after{content:"▼";margin-left:auto;font-size:11px;color:var(--muted)}
+  .howto[open] > summary::after{content:"▲"}
+  .howto ol{margin:0;padding:0 16px 16px;list-style:none;counter-reset:s}
+  .howto li{
+    counter-increment:s;position:relative;padding:10px 0 10px 44px;font-size:14.5px;
+    line-height:1.8;border-top:1px solid var(--line-soft)
+  }
+  .howto li::before{
+    content:counter(s);position:absolute;left:0;top:12px;width:30px;height:30px;border-radius:999px;
+    background:var(--green-solid);color:var(--green-solid-fg);font-size:15px;font-weight:800;display:grid;place-items:center;line-height:1
+  }
+  .howto li b{display:block;font-size:15.5px;font-weight:800;color:var(--ink)}
+  .howto li em{font-style:normal;color:var(--ink-soft)}
+
+  /* ══ 記録 ══ */
+  h2.sec{font-size:17px;font-weight:800;margin:26px 0 0;display:flex;align-items:center;gap:8px}
+  .sec-note{font-size:13px;color:var(--ink-soft);margin:3px 0 0;line-height:1.7}
+
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:12px 0 0}
+  .panel{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow)}
+  .panel.green{border-color:var(--green);background:var(--green-bg)}
+  .panel.orange{border-color:var(--orange);background:var(--orange-bg)}
+  .stat .k{font-size:13px;font-weight:700;margin:0;display:flex;align-items:center;gap:5px}
+  .panel.green .k{color:var(--green-ink)}
+  .panel.orange .k{color:var(--orange-ink)}
+  .stat .v{font-size:26px;font-weight:800;margin:2px 0 0;line-height:1.3;letter-spacing:-.01em}
+  .stat .v small{font-size:14px;font-weight:700;margin-left:1px}
+  .stat .n{font-size:12.5px;color:var(--ink-soft);margin:0;font-weight:600}
+
+  .budget-text{font-size:14.5px;font-weight:700;margin:0 0 4px}
+  .budget .bar{height:16px}
+  .budget .bar i{background:var(--orange)}
+  .budget .bar.over i{background:var(--red)}
+
+  .chart{display:flex;gap:9px;align-items:flex-end;height:150px;margin:14px 0 0}
+  .chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .chart .stack{width:100%;max-width:38px;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;flex:1}
+  .chart .seg{border-radius:5px;min-height:0}
+  .chart .seg.b{background:var(--orange)}
+  .chart .seg.s{background:var(--green)}
+  .chart .cap{font-size:12px;color:var(--ink-soft);font-weight:700;white-space:nowrap}
+  .chart .col.now .cap{color:var(--ink);background:var(--line-soft);border-radius:999px;padding:0 8px}
+  .legend{display:flex;gap:16px;font-size:13px;color:var(--ink-soft);margin:12px 0 0;justify-content:center;font-weight:700}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .legend s{width:14px;height:14px;border-radius:4px;display:inline-block}
+  .legend s.b{background:var(--orange)}
+  .legend s.s{background:var(--green)}
+
+  .callout{
+    display:flex;gap:10px;align-items:flex-start;background:var(--green-bg);color:var(--green-ink);
+    border-radius:14px;padding:13px 15px;font-size:14.5px;line-height:1.8;font-weight:600;margin:12px 0 0
+  }
+  .callout .ic{font-size:19px;line-height:1.5}
+
+  .tag-rank .row{display:flex;align-items:center;gap:10px;font-size:14px;padding:7px 0}
+  .tag-rank .row + .row{border-top:1px solid var(--line-soft)}
+  .tag-rank .nm{width:104px;flex:none;font-weight:700;font-size:13px}
+  .tag-rank .tr{flex:1;height:12px;background:var(--line-soft);border-radius:999px;overflow:hidden}
+  .tag-rank .tr i{display:block;height:100%;background:var(--orange);border-radius:999px}
+  .tag-rank .vl{width:82px;text-align:right;font-size:13px;font-weight:700;white-space:nowrap}
+
+  /* ══ 履歴 ══ */
+  .log{background:var(--card);border:2px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;margin:14px 0}
+  .log .month{font-size:14px;font-weight:800;padding:11px 15px;background:var(--card-2);border-bottom:2px solid var(--line-soft)}
+  .log .row{display:flex;align-items:center;gap:11px;padding:12px 15px}
+  .log .row + .row{border-top:1px solid var(--line-soft)}
+  .log .mark{
+    flex:none;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:800
+  }
+  .log .mark.s{background:var(--green-bg);color:var(--green-ink)}
+  .log .mark.b{background:var(--orange-bg);color:var(--orange-ink)}
+  .log .nm{flex:1;min-width:0;font-size:15px;font-weight:700;line-height:1.5}
+  .log .nm span{display:block;font-size:12px;color:var(--muted);font-weight:600;
+                white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .log .pr{font-size:16px;font-weight:800;white-space:nowrap}
+  .log .pr small{font-size:12px}
+  .log .del{border:none;background:none;color:var(--muted);font-size:20px;padding:4px;line-height:1}
+  .log .del:hover{color:var(--red)}
+
+  /* ══ 画面下のボタン ══ */
+  .fab-row{
+    position:fixed;left:50%;transform:translateX(-50%);
+    bottom:calc(18px + env(safe-area-inset-bottom));z-index:30;width:min(94%,460px);
+    display:flex;gap:9px
+  }
+  .fab{
+    flex:1;border:none;border-radius:16px;background:var(--green-solid);color:var(--green-solid-fg);
+    padding:15px 14px;font-size:17px;font-weight:800;
+    box-shadow:0 6px 22px rgba(31,122,90,.4);display:flex;align-items:center;justify-content:center;gap:8px
+  }
+  .fab:active{transform:scale(.98)}
+  .fab-sub{
+    flex:none;width:86px;border:2px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);
+    font-size:12px;font-weight:800;box-shadow:var(--shadow-lg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;line-height:1.3
+  }
+  .fab-sub .ic{font-size:20px}
+  .fab-sub:active{transform:scale(.98)}
+
+  /* ══ ダイアログ ══ */
+  dialog{
+    border:none;border-radius:22px 22px 0 0;padding:0;background:var(--card);color:var(--ink);
+    width:100%;max-width:600px;max-height:94vh;margin:auto auto 0;box-shadow:0 -8px 40px rgba(0,0,0,.28)
+  }
+  @media (min-width:640px){ dialog{border-radius:22px;margin:auto} }
+  dialog::backdrop{background:rgba(15,20,26,.55)}
+  dialog[open]{display:flex;flex-direction:column}
+  dialog > form{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+  .dlg-head{
+    flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:16px 18px;border-bottom:2px solid var(--line)
+  }
+  .dlg-head h2{font-size:18px;font-weight:800;margin:0}
+  .dlg-body{flex:1 1 auto;min-height:0;padding:18px 18px 24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .dlg-foot{
+    flex:none;border-top:2px solid var(--line);background:var(--card);
+    padding:12px 18px calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:9px
+  }
+  .x{border:none;background:var(--card-2);border-radius:999px;color:var(--ink-soft);font-size:20px;line-height:1;width:38px;height:38px;flex:none}
+
+  /* フォーム */
+  .field{margin:0 0 20px}
+  .field > .lb{display:flex;align-items:center;gap:8px;font-size:15.5px;font-weight:800;margin:0 0 6px}
+  .field > .lb .no{
+    width:26px;height:26px;border-radius:999px;background:var(--green-solid);color:var(--green-solid-fg);
+    font-size:14px;font-weight:800;display:grid;place-items:center;flex:none;line-height:1
+  }
+  .field > .lb .opt{font-size:11.5px;font-weight:700;color:var(--muted);background:var(--line-soft);border-radius:999px;padding:1px 8px}
+  .field .help{font-size:12.5px;color:var(--ink-soft);margin:0 0 7px;line-height:1.7}
+  .in{
+    width:100%;min-height:52px;padding:12px 14px;border:2px solid var(--line);border-radius:14px;
+    background:var(--card-2);color:var(--ink);font-size:16.5px;font-weight:600
+  }
+  .in:focus{outline:none;border-color:var(--green);background:var(--card)}
+  textarea.in{min-height:90px;resize:vertical;line-height:1.8;font-weight:500}
+  .two{display:grid;grid-template-columns:1.1fr 1fr;gap:10px}
+  .yen-wrap{position:relative}
+  .yen-wrap .in{padding-right:38px}
+  .yen-wrap .unit{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--ink-soft)}
+
+  .seg-pick{display:flex;gap:7px;flex-wrap:wrap}
+  .seg-pick button{
+    padding:9px 15px;border-radius:999px;border:2px solid var(--line);background:var(--card);
+    color:var(--ink-soft);font-size:14px;font-weight:700;min-height:44px
+  }
+  .seg-pick button[aria-pressed="true"]{background:var(--green-solid);border-color:var(--green-solid);color:var(--green-solid-fg)}
+  .seg-pick.big button{flex:1;min-width:130px;flex-direction:column;display:flex;align-items:center;justify-content:center;line-height:1.4;gap:0}
+  .seg-pick.big button small{font-size:11.5px;font-weight:600;opacity:.85}
+
+  .stars{display:flex;gap:2px;justify-content:center}
+  .stars button{border:none;background:none;font-size:38px;line-height:1;padding:2px;color:var(--line)}
+  .stars button.on{color:#f0b429}
+  .want-note{font-size:14.5px;font-weight:700;margin:2px 0 0;text-align:center;color:var(--ink-soft)}
+
+  .checks{border:2px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+  .checks label{display:flex;gap:11px;align-items:center;padding:12px 14px;font-size:14.5px;line-height:1.6;font-weight:600}
+  .checks label + label{border-top:1px solid var(--line-soft)}
+  .checks input{width:22px;height:22px;flex:none;accent-color:var(--green);margin:0}
+  .checks label:has(input:checked){background:var(--orange-bg);color:var(--orange-ink)}
+  .sign-note{font-size:13.5px;margin:9px 0 0;color:var(--ink-soft);font-weight:700;line-height:1.7}
+  .sign-note.hot{color:var(--orange-ink);background:var(--orange-bg);border-radius:12px;padding:10px 13px}
+
+  .cool-box{
+    background:var(--green-bg);color:var(--green-ink);border-radius:14px;padding:13px 15px;margin:8px 0 0
+  }
+  .cool-box .t{font-size:13px;font-weight:700;margin:0}
+  .cool-box .d{font-size:19px;font-weight:800;margin:1px 0 0}
+  .cool-box .w{font-size:12.5px;font-weight:600;margin:4px 0 0;line-height:1.7;opacity:.95}
+
+  /* 判定ダイアログ */
+  .j-ask{font-size:21px;font-weight:800;margin:0 0 2px;text-align:center}
+  .j-item{background:var(--card-2);border-radius:16px;padding:14px;text-align:center;margin:14px 0 0}
+  .j-item .nm{font-size:18px;font-weight:800;margin:0;line-height:1.5}
+  .j-item .pr{font-size:30px;font-weight:800;margin:2px 0 0}
+  .j-item .pr small{font-size:16px}
+  .cmp{display:grid;grid-template-columns:1fr auto 1fr;gap:9px;align-items:center;text-align:center;margin:14px 0 0}
+  .cmp .box{background:var(--card-2);border-radius:14px;padding:11px 6px}
+  .cmp .box .k{font-size:12px;font-weight:700;color:var(--ink-soft);margin:0}
+  .cmp .box .v{font-size:19px;margin:2px 0 0;color:#f0b429;letter-spacing:.04em}
+  .cmp .box .v s{color:var(--line);text-decoration:none}
+  .cmp .arw{color:var(--muted);font-size:18px;font-weight:800}
+  .j-hint{font-size:14px;font-weight:700;margin:12px 0 0;text-align:center;line-height:1.7;
+          background:var(--blue-bg);border-radius:12px;padding:11px 13px}
+
+  /* 設定 */
+  .set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;font-size:14.5px;font-weight:700}
+  .set-row + .set-row{border-top:1px solid var(--line-soft)}
+  .set-row .in{width:auto;max-width:180px;min-height:46px;text-align:right}
+  .set-row select.in{text-align:left}
+  .set-row .btn{width:auto;min-width:120px;min-height:44px;font-size:14px}
+  .danger{color:var(--red);border-color:var(--red)}
+  .hint{font-size:12.5px;color:var(--ink-soft);line-height:1.8;margin:8px 0 0;font-weight:500}
+
+  /* ══ 目標（記録タブ） ══ */
+  .goal-panel .gname{font-size:18px;font-weight:800;margin:0;display:flex;align-items:center;gap:7px}
+  .goal-panel .gamt{font-size:14px;font-weight:700;color:var(--ink-soft);margin:1px 0 0}
+  .goal-panel .gbig{font-size:28px;font-weight:800;margin:10px 0 0;color:var(--green)}
+  .goal-panel .gbig small{font-size:14px;color:var(--ink-soft);font-weight:700;margin-left:2px}
+  .goal-panel .bar{height:16px}
+  .goal-panel .bar-ends{margin-top:6px}
+  .goal-hist{font-size:13.5px;font-weight:600;color:var(--ink-soft)}
+  .goal-hist .row{display:flex;justify-content:space-between;gap:10px;padding:7px 0}
+  .goal-hist .row + .row{border-top:1px solid var(--line-soft)}
+  .goal-hist b{font-weight:800;color:var(--ink)}
+
+  /* ══ 気晴らし ══ */
+  .mood-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .mood-grid button{
+    min-height:74px;border:2px solid var(--line);border-radius:16px;background:var(--card-2);color:var(--ink);
+    font-size:14.5px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px
+  }
+  .mood-grid button .ic{font-size:26px;line-height:1.1}
+  .mood-grid button[aria-pressed="true"]{border-color:var(--green);background:var(--green-bg);color:var(--green-ink)}
+
+  .idea{
+    display:block;width:100%;text-align:left;color:var(--ink);
+    border:2px solid var(--line);border-radius:16px;padding:14px 15px;margin:11px 0 0;background:var(--card-2)
+  }
+  .idea[aria-pressed="true"]{border-color:var(--green);background:var(--green-bg)}
+  .idea[aria-pressed="true"] .it{color:var(--green-ink)}
+  .idea .it{font-size:16.5px;font-weight:800;margin:0;line-height:1.6}
+  .idea .id{font-size:13.5px;color:var(--ink-soft);margin:4px 0 0;font-weight:500;line-height:1.7}
+  .idea .im{display:inline-block;font-size:12px;font-weight:800;color:var(--blue);background:var(--blue-bg);
+            border-radius:999px;padding:2px 10px;margin:0 0 6px}
+  .relief-head{font-size:17px;font-weight:800;margin:0 0 4px}
+  .relief-lead{font-size:13.5px;color:var(--ink-soft);margin:0 0 14px;line-height:1.7;font-weight:500}
+  .relief-tip{
+    display:flex;gap:9px;align-items:flex-start;background:var(--amber-bg);color:var(--amber-ink);
+    border-radius:12px;padding:11px 13px;font-size:13.5px;font-weight:700;line-height:1.7;margin:14px 0 0
+  }
+  .relief-link{
+    width:100%;min-height:48px;margin:10px 0 0;border:2px solid var(--amber);border-radius:12px;
+    background:var(--amber-bg);color:var(--amber-ink);font-size:14.5px;font-weight:800
+  }
+
+  .toast{
+    position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom));
+    background:var(--ink);color:var(--paper);padding:13px 22px;border-radius:14px;font-size:15px;font-weight:700;
+    z-index:60;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;max-width:90%;text-align:center;
+    box-shadow:var(--shadow-lg)
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="top-row">
+      <div class="brand">
+        <img src="icons/icon.svg" alt="" width="44" height="44">
+        <div>
+          <h1>ひと呼吸</h1>
+          <p class="tagline">買う前に、いったん預けるアプリ</p>
+        </div>
+      </div>
+      <button class="icon-btn" id="btnSettings" type="button" aria-label="設定">⚙</button>
+    </div>
+
+    <div class="savings">
+      <p class="lbl">🐖 がまん貯金（買わずに浮いたお金）</p>
+      <p class="amt num" id="savTotal">0<small>円</small></p>
+      <p class="side" id="savSide">「やめておく」を選ぶと、その金額がここにたまります</p>
+      <div id="savGoal"></div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="表示の切り替え">
+    <button class="tab" role="tab" data-view="judge" aria-selected="false">
+      <span class="ic" aria-hidden="true">⏰</span>決める<span class="badge" id="bJudge" hidden>0</span></button>
+    <button class="tab" role="tab" data-view="wait" aria-selected="true">
+      <span class="ic" aria-hidden="true">📦</span>あずけ中<span class="badge" id="bWait" hidden>0</span></button>
+    <button class="tab" role="tab" data-view="stat" aria-selected="false">
+      <span class="ic" aria-hidden="true">📊</span>記録</button>
+    <button class="tab" role="tab" data-view="log" aria-selected="false">
+      <span class="ic" aria-hidden="true">📋</span>履歴</button>
+  </nav>
+
+  <main>
+    <!-- 決める（判定待ち） -->
+    <section class="view" id="view-judge" hidden>
+      <div class="view-note">
+        <span aria-hidden="true">⏰</span>
+        <div><b>あずける時間が終わったもの</b>です。ひとつずつ「買う」か「やめる」を選んでください。</div>
+      </div>
+      <div id="judgeList"></div>
+    </section>
+
+    <!-- あずけ中 -->
+    <section class="view" id="view-wait">
+      <div class="view-note">
+        <span aria-hidden="true">📦</span>
+        <div><b>いま頭を冷やしている最中</b>のものです。時間が来たら「決める」タブに移ります。</div>
+      </div>
+      <div id="waitList"></div>
+
+      <details class="howto" id="howto">
+        <summary>❓ このアプリのつかいかた</summary>
+        <ol>
+          <li><b>欲しくなったら、まず預ける</b><em>買わずに、下の緑のボタンから登録します。「なぜ欲しいのか」も書いておきます。</em></li>
+          <li><b>時間をおく</b><em>金額に応じて1日〜1ヶ月あずかります。この間は買いません。</em></li>
+          <li><b>改めて決める</b><em>自分が書いた理由を読み返して、まだ欲しければ買う、そうでなければやめる。</em></li>
+          <li><b>やめた分は貯金になる</b><em>買わずに済んだ金額が「がまん貯金」としてたまっていきます。</em></li>
+        </ol>
+      </details>
+    </section>
+
+    <!-- 記録 -->
+    <section class="view" id="view-stat" hidden>
+      <div class="view-note">
+        <span aria-hidden="true">📊</span>
+        <div><b>今月の使いぐあい</b>と、これまでの傾向です。</div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="panel stat green">
+          <p class="k">✋ 今月やめた</p>
+          <p class="v num" id="mSkip">0<small>円</small></p>
+          <p class="n" id="mSkipN">0件</p>
+        </div>
+        <div class="panel stat orange">
+          <p class="k">🛍 今月買った</p>
+          <p class="v num" id="mBuy">0<small>円</small></p>
+          <p class="n" id="mBuyN">0件</p>
+        </div>
+      </div>
+
+      <h2 class="sec">🎯 貯金の目標</h2>
+      <p class="sec-note">やめておいた金額が、この目標に積み立てられていきます。</p>
+      <div id="goalArea" style="margin-top:12px"></div>
+
+      <h2 class="sec">🫧 気晴らしの記録</h2>
+      <p class="sec-note">買わずに気分を切り替えられた回数です。</p>
+      <div class="panel" id="reliefArea" style="margin-top:12px"></div>
+
+      <h2 class="sec">💰 今月の予算</h2>
+      <p class="sec-note">「買った」と決めた金額の合計です。予算は ⚙ から決められます。</p>
+      <div class="panel budget" style="margin-top:12px">
+        <p class="budget-text" id="budgetText">予算はまだ決めていません</p>
+        <div class="bar" id="budgetBar"><i style="width:0%"></i></div>
+      </div>
+
+      <h2 class="sec">📈 月ごとの推移</h2>
+      <p class="sec-note">直近6ヶ月。オレンジが買った金額、緑ががまんした金額です。</p>
+      <div class="panel" style="margin-top:12px">
+        <div class="chart" id="chart"></div>
+        <div class="legend"><span><s class="b"></s>買った</span><span><s class="s"></s>がまんした</span></div>
+      </div>
+
+      <h2 class="sec">🌱 ひと呼吸の効きめ</h2>
+      <div class="callout" id="insightBox">
+        <span class="ic" aria-hidden="true">🌱</span>
+        <div id="insight">まだ記録がありません。まずはひとつ預けてみてください。</div>
+      </div>
+
+      <h2 class="sec">🧺 買ったもの・内訳</h2>
+      <p class="sec-note">どの種類にお金を使っているかの合計です。</p>
+      <div class="panel tag-rank" id="tagRank" style="margin-top:12px">
+        <p class="n">まだ「買った」記録がありません。</p>
+      </div>
+    </section>
+
+    <!-- 履歴 -->
+    <section class="view" id="view-log" hidden>
+      <div class="view-note">
+        <span aria-hidden="true">📋</span>
+        <div><b>決めたもの</b>の一覧です。× で記録を消せます。</div>
+      </div>
+      <div id="logList"></div>
+    </section>
+  </main>
+</div>
+
+<div class="fab-row">
+  <button class="fab" id="btnAdd" type="button"><span aria-hidden="true">＋</span> 欲しいものを預ける</button>
+  <button class="fab-sub" id="btnRelief" type="button">
+    <span class="ic" aria-hidden="true">🫧</span>気晴らし</button>
+</div>
+
+<!-- ══ 追加ダイアログ ══ -->
+<dialog id="dlgAdd">
+  <form method="dialog" id="formAdd">
+    <div class="dlg-head">
+      <h2>欲しいものを預ける</h2>
+      <button class="x" type="button" data-close="dlgAdd" aria-label="閉じる">×</button>
+    </div>
+    <div class="dlg-body">
+      <div class="field">
+        <label class="lb" for="fName"><span class="no">1</span>なにが欲しい？</label>
+        <input class="in" id="fName" type="text" placeholder="ワイヤレスイヤホン" required maxlength="60">
+      </div>
+
+      <div class="field">
+        <label class="lb" for="fPrice"><span class="no">2</span>おいくら？</label>
+        <div class="two">
+          <div class="yen-wrap">
+            <input class="in num" id="fPrice" type="number" inputmode="numeric" min="0" step="1" placeholder="12000" required>
+            <span class="unit">円</span>
+          </div>
+          <input class="in" id="fShop" type="text" placeholder="お店（任意）" maxlength="40">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lb" for="fUrl"><span class="no">3</span>商品ページ<span class="opt">任意</span></label>
+        <p class="help">リンクを貼っておくと、決めるときに見返せます。</p>
+        <input class="in" id="fUrl" type="url" placeholder="https://" inputmode="url">
+      </div>
+
+      <div class="field">
+        <p class="lb"><span class="no">4</span>どんな種類？</p>
+        <div class="seg-pick" id="fTags"></div>
+      </div>
+
+      <div class="field">
+        <p class="lb"><span class="no">5</span>これは必要？それとも欲しい？</p>
+        <p class="help">「必要なもの」を選ぶと、あずける時間が半分になります。</p>
+        <div class="seg-pick big" id="fKind">
+          <button type="button" data-kind="want" aria-pressed="true">欲しいもの<small>なくても困らない</small></button>
+          <button type="button" data-kind="need" aria-pressed="false">必要なもの<small>ないと困る</small></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <p class="lb"><span class="no">6</span>いま、どれくらい欲しい？</p>
+        <div class="stars" id="fWant"></div>
+        <p class="want-note" id="fWantNote">かなり欲しい</p>
+      </div>
+
+      <div class="field">
+        <label class="lb" for="fReason"><span class="no">7</span>なぜ欲しいのか<span class="opt">任意</span></label>
+        <p class="help">あとで自分が読み返す言葉です。ここが効きます。</p>
+        <textarea class="in" id="fReason" placeholder="今のイヤホンの左が聞こえにくいから。通勤で毎日使う。" maxlength="300"></textarea>
+      </div>
+
+      <div class="field">
+        <p class="lb"><span class="no">8</span>あてはまるものにチェック</p>
+        <p class="help">衝動買いになりやすいサインです。3つ以上つくと、あずける時間が2倍になります。</p>
+        <div class="checks" id="fSigns"></div>
+        <p class="sign-note" id="fSignNote"></p>
+        <button class="relief-link" type="button" id="fRelief" hidden>🫧 先に気晴らしを試してみる</button>
+      </div>
+
+      <div class="field" style="margin-bottom:0">
+        <label class="lb" for="fCool"><span class="no">9</span>いつまで預ける？</label>
+        <select class="in" id="fCool"></select>
+        <div class="cool-box">
+          <p class="t">この日まで買わずに待ちます</p>
+          <p class="d" id="fCoolDate">—</p>
+          <p class="w" id="fCoolWhy"></p>
+        </div>
+      </div>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn green" type="submit" id="addSubmit">この内容で預ける</button>
+      <button class="btn plain" type="button" data-close="dlgAdd">やめる</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ══ 判定ダイアログ ══ -->
+<dialog id="dlgJudge">
+  <div class="dlg-head">
+    <h2>買うか決める</h2>
+    <button class="x" type="button" data-close="dlgJudge" aria-label="閉じる">×</button>
+  </div>
+  <div class="dlg-body">
+    <p class="j-ask">まだ欲しいですか？</p>
+    <div class="j-item">
+      <p class="nm" id="jName"></p>
+      <p class="pr num" id="jPrice"></p>
+    </div>
+    <div class="quote" id="jReason" hidden>
+      <div class="qh">📝 預けたときに、自分が書いた理由</div>
+      <p id="jReasonText"></p>
+    </div>
+
+    <div class="field" style="margin:18px 0 0">
+      <p class="lb" style="justify-content:center">いま、どれくらい欲しい？</p>
+      <div class="stars" id="jWant"></div>
+      <p class="want-note" id="jWantNote"></p>
+    </div>
+
+    <div class="cmp">
+      <div class="box"><p class="k">預けたとき</p><p class="v" id="jWasStars"></p></div>
+      <div class="arw">→</div>
+      <div class="box"><p class="k">いま</p><p class="v" id="jNowStars"></p></div>
+    </div>
+    <p class="j-hint" id="jHint"></p>
+  </div>
+  <div class="dlg-foot">
+    <button class="btn green" type="button" id="jSkip">やめておく<span id="jSkipSub"></span></button>
+    <button class="btn orange" type="button" id="jBuy">買う<span>今月の買った金額に記録します</span></button>
+    <button class="btn plain" type="button" id="jSnooze">決められない — もう7日あずける</button>
+  </div>
+</dialog>
+
+<!-- ══ 設定ダイアログ ══ -->
+<dialog id="dlgSet">
+  <div class="dlg-head">
+    <h2>設定</h2>
+    <button class="x" type="button" data-close="dlgSet" aria-label="閉じる">×</button>
+  </div>
+  <div class="dlg-body">
+    <h2 class="sec" style="margin-top:0">💰 ひと月の買い物予算</h2>
+    <p class="sec-note">0のままなら、予算のバーは表示されません。</p>
+    <div class="set-row">
+      <span>予算</span>
+      <input class="in num" id="sBudget" type="number" inputmode="numeric" min="0" step="1" placeholder="0">
+    </div>
+
+    <h2 class="sec">⏳ あずける時間のめやす</h2>
+    <p class="sec-note">金額で自動的に決まります。「必要なもの」は半分、衝動サインが3つ以上つくと2倍になります。</p>
+    <div id="sRules"></div>
+
+    <h2 class="sec">🎨 見た目</h2>
+    <div class="set-row">
+      <span>テーマ</span>
+      <select class="in" id="sTheme">
+        <option value="auto">端末に合わせる</option>
+        <option value="light">明るい</option>
+        <option value="dark">暗い</option>
+      </select>
+    </div>
+
+    <h2 class="sec">🔔 お知らせ</h2>
+    <div class="set-row">
+      <span>あずけ終わりを通知</span>
+      <button class="btn small" type="button" id="sNotify">許可する</button>
+    </div>
+    <p class="hint">通知はこのアプリを開いている間だけ届きます。iPhoneでは、ホーム画面に追加したアプリから開いてください。</p>
+
+    <h2 class="sec">💾 データ</h2>
+    <div class="set-row">
+      <span>バックアップを書き出す</span>
+      <button class="btn small" type="button" id="sExport">書き出す</button>
+    </div>
+    <div class="set-row">
+      <span>バックアップを読み込む</span>
+      <button class="btn small" type="button" id="sImport">読み込む</button>
+    </div>
+    <input type="file" id="sFile" accept="application/json,.json" hidden>
+    <div class="set-row">
+      <span>すべて消す</span>
+      <button class="btn small danger" type="button" id="sReset">全消去</button>
+    </div>
+    <p class="hint">記録はこの端末の中だけに保存されます。ブラウザのデータを消すと記録も消えるので、ときどき書き出しておくと安心です。</p>
+  </div>
+  <div class="dlg-foot">
+    <button class="btn green" type="button" data-close="dlgSet">閉じる</button>
+  </div>
+</dialog>
+
+<!-- ══ 目標ダイアログ ══ -->
+<dialog id="dlgGoal">
+  <form method="dialog" id="formGoal">
+    <div class="dlg-head">
+      <h2 id="goalTitle">貯金の目標を決める</h2>
+      <button class="x" type="button" data-close="dlgGoal" aria-label="閉じる">×</button>
+    </div>
+    <div class="dlg-body">
+      <p class="relief-lead">がまん貯金が、この目標に向かって積み上がります。「北海道旅行」「新しい冷蔵庫」など、買い物をやめたごほうびになるものがおすすめです。</p>
+
+      <div class="field">
+        <label class="lb" for="gName"><span class="no">1</span>なにを目標にする？</label>
+        <input class="in" id="gName" type="text" placeholder="北海道旅行" required maxlength="40">
+      </div>
+
+      <div class="field">
+        <label class="lb" for="gAmount"><span class="no">2</span>いくら貯める？</label>
+        <div class="yen-wrap">
+          <input class="in num" id="gAmount" type="number" inputmode="numeric" min="1" step="1" placeholder="150000" required>
+          <span class="unit">円</span>
+        </div>
+      </div>
+
+      <div class="field" id="gBaseField">
+        <p class="lb"><span class="no">3</span>いまの貯金はどうする？</p>
+        <div class="seg-pick big" id="gBase">
+          <button type="button" data-base="use" aria-pressed="true">目標にあてる<small id="gBaseUse">いまの貯金から数える</small></button>
+          <button type="button" data-base="keep" aria-pressed="false">とっておく<small>これから貯める分だけ数える</small></button>
+        </div>
+      </div>
+
+      <div class="cool-box">
+        <p class="t">この目標までの道のり</p>
+        <p class="d" id="gPreview">—</p>
+        <p class="w" id="gPreviewWhy"></p>
+      </div>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn green" type="submit">この目標にする</button>
+      <button class="btn plain" type="button" id="gDelete" hidden>この目標をやめる</button>
+      <button class="btn plain" type="button" data-close="dlgGoal">とじる</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ══ 気晴らしダイアログ ══ -->
+<dialog id="dlgRelief">
+  <div class="dlg-head">
+    <h2>買わずに、気分を変える</h2>
+    <button class="x" type="button" data-close="dlgRelief" aria-label="閉じる">×</button>
+  </div>
+  <div class="dlg-body">
+    <div id="reliefStep1">
+      <p class="relief-head">いま、どんな気分ですか？</p>
+      <p class="relief-lead">買いたい気持ちの後ろには、たいてい別の気持ちがあります。近いものを選んでください。</p>
+      <div class="mood-grid" id="moodGrid"></div>
+      <div class="relief-tip">
+        <span aria-hidden="true">💡</span>
+        <div>気持ちが動いているときの買い物は、あとで後悔しやすいと言われます。まず15分だけ、別のことをしてみましょう。</div>
+      </div>
+    </div>
+
+    <div id="reliefStep2" hidden>
+      <p class="relief-head" id="reliefMoodName"></p>
+      <p class="relief-lead">この中から、いまできそうなものをひとつ選んでください。</p>
+      <div id="ideaList"></div>
+      <button class="btn small" type="button" id="reliefMore" style="margin-top:12px">ほかの案を見る</button>
+      <button class="btn plain" type="button" id="reliefBack">気分を選びなおす</button>
+    </div>
+  </div>
+  <div class="dlg-foot" id="reliefFoot" hidden>
+    <button class="btn green" type="button" id="reliefDone">やってみた！<span>気晴らしの記録に1回たします</span></button>
+    <button class="btn plain" type="button" data-close="dlgRelief">とじる</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ═══════════════════════════════════════════════════════
+   ひと呼吸 — 買う前のクールダウン
+   データはすべてこの端末の localStorage に保存する。
+   ═══════════════════════════════════════════════════════ */
+
+const KEY = 'hitokokyuu.v1';
+const HOUR = 3600 * 1000;
+const DAY  = 24 * HOUR;
+
+/* 種類（カテゴリ）。記録の内訳で使う */
+const TAGS = ['服・コスメ','食べもの','本・ゲーム','推し・グッズ','家電・ガジェット','日用品','その他'];
+
+/* 欲しい度の言葉 */
+const WANT_WORDS = ['','なんとなく','ちょっと欲しい','まあまあ欲しい','かなり欲しい','どうしても欲しい'];
+
+/* 衝動のサイン（チェックが多いほど、あずける時間を延ばす） */
+const SIGNS = [
+  '同じような物を、もう持っている',
+  'セール・期間限定に背中を押されている',
+  '疲れている／気分を変えたくて見ている',
+  '置き場所がまだ決まっていない',
+  '使う予定の日が、まだ決まっていない'
+];
+
+/* ── 気晴らしの提案 ──────────────────────
+   買い物以外で気分を切り替える案。気分ごとに用意しておき、
+   その場で3つずつ出す。ぜんぶこの中に入っているので通信はいらない。 */
+const MOODS = [
+  { k:'angry',   ic:'😤', t:'イライラする' },
+  { k:'tired',   ic:'😮‍💨', t:'疲れた' },
+  { k:'lonely',  ic:'🫥', t:'さみしい' },
+  { k:'bored',   ic:'🥱', t:'退屈' },
+  { k:'anxious', ic:'😟', t:'不安・もやもや' },
+  { k:'shop',    ic:'🛍️', t:'とにかく買いたい' }
+];
+const IDEAS = {
+  angry:[
+    { t:'4秒吸って、8秒かけて吐く', m:2,  d:'これを5回。吐く息を長くすると、体のほうから落ち着いてきます。' },
+    { t:'手首と首を冷たい水で冷やす', m:1, d:'頭に上った熱が引いて、視界が戻ってきます。' },
+    { t:'早足で10分だけ歩く', m:10, d:'歩くリズムが、考えごとをほどいてくれます。' },
+    { t:'いらない紙を思いきり破る', m:2, d:'音と手ごたえで、意外とすっきりします。' },
+    { t:'引き出しをひとつだけ片づける', m:10, d:'手を動かしているうちに、気持ちが落ち着きます。' },
+    { t:'腹が立ったことを紙に書いて、丸めて捨てる', m:5, d:'外に出してしまうと、抱えずにすみます。' },
+    { t:'熱いシャワーを浴びる', m:10, d:'いったん体を切り替えると、判断も変わります。' }
+  ],
+  tired:[
+    { t:'白湯かお茶を、ゆっくり一杯', m:5, d:'温かいものを飲むだけで、ひと息つけます。' },
+    { t:'アラームをかけて15分だけ横になる', m:15, d:'短い休息でも、判断力はかなり戻ります。' },
+    { t:'蒸しタオルで目を温める', m:5, d:'画面の疲れがやわらぎます。' },
+    { t:'肩と足首をゆっくりまわす', m:3, d:'固まったところをほぐすと、気分も軽くなります。' },
+    { t:'明かりを落として、好きな曲を1曲', m:5, d:'何もしない時間を、自分に許してあげてください。' },
+    { t:'今日はもう店じまい、と決めて寝支度', m:15, d:'疲れた日の買い物は、たいてい翌日に後悔します。' },
+    { t:'5分だけ、なにもしない', m:5, d:'スマホも置いて、ぼんやりするだけでかまいません。' }
+  ],
+  lonely:[
+    { t:'誰かに「元気？」と一言だけ送る', m:2, d:'返事がなくても大丈夫。送った時点で少し軽くなります。' },
+    { t:'昔の写真フォルダを見返す', m:10, d:'もう持っている楽しさを思い出せます。' },
+    { t:'好きな動画・配信を1本だけ', m:20, d:'時間を決めて見ると、後ろめたさが残りません。' },
+    { t:'推しの供給を眺める（買わずに）', m:10, d:'見るだけでも、ちゃんと満たされます。' },
+    { t:'湯船にゆっくりつかる', m:20, d:'ひとりの時間を、気持ちのいい時間に変えます。' },
+    { t:'好きな曲を声に出して歌う', m:10, d:'声を出すと、さみしさが少し薄まります。' },
+    { t:'返しそびれていた連絡を1件返す', m:10, d:'つながりが戻ると、買い物欲は落ち着きます。' }
+  ],
+  bored:[
+    { t:'積んである本を5ページだけ', m:5, d:'5ページでやめていいと決めると、始められます。' },
+    { t:'いつもと違う道を散歩する', m:20, d:'新しいものが欲しい気分は、新しい景色でも満たせます。' },
+    { t:'部屋の模様替えを1か所だけ', m:15, d:'買わなくても、部屋は新しくなります。' },
+    { t:'作ってみたかったものを1品つくる', m:30, d:'手を動かす楽しさは、買う楽しさとよく似ています。' },
+    { t:'ストレッチ動画を1本やってみる', m:10, d:'体が動くと、頭の退屈も晴れます。' },
+    { t:'使っていない物を1つ、売る準備をする', m:15, d:'増やす代わりに減らすと、気分が切り替わります。' },
+    { t:'行きたい場所を調べてメモする', m:10, d:'次の楽しみをつくるほうが、長く効きます。' }
+  ],
+  anxious:[
+    { t:'不安なことを紙に全部書き出す', m:10, d:'頭の中にあるうちは、実際より大きく見えます。' },
+    { t:'明日やることを3つだけ決める', m:5, d:'3つに絞ると、急に身軽になります。' },
+    { t:'箱呼吸（4秒吸う・止める・吐く・止める）を5回', m:3, d:'呼吸を数えている間は、心配事から離れられます。' },
+    { t:'お金のことを、1回だけちゃんと見る', m:10, d:'見えない不安より、見える数字のほうが軽いものです。' },
+    { t:'照明を暖色にして、音を消す', m:2, d:'刺激を減らすと、そわそわが静まります。' },
+    { t:'早めに寝る支度をはじめる', m:15, d:'不安なときの買い物は、翌朝いちばん後悔します。' },
+    { t:'聞き慣れた曲を1曲、歩きながら', m:10, d:'知っているものは、それだけで安心をくれます。' }
+  ],
+  shop:[
+    { t:'カートに入れるだけ入れて、買わずに閉じる', m:5, d:'選んでいる時間がいちばん楽しい、ということがよくあります。' },
+    { t:'家にある「お気に入り」を3つ並べて眺める', m:5, d:'すでに持っている良い物を、思い出してください。' },
+    { t:'「あずけ中」のリストを読み返す', m:5, d:'前に欲しかったものを見ると、熱が冷めます。' },
+    { t:'クローゼットや棚で、似た物を探す', m:10, d:'あると気づいたとたん、欲しさは下がります。' },
+    { t:'買ったつもりで、その金額をがまん貯金に足す', m:1, d:'「買った満足」と「貯まる満足」を両取りできます。' },
+    { t:'使っていない物をひとつ売りに出す', m:15, d:'買い物の楽しさは、手放すほうでも味わえます。' },
+    { t:'目標まであと何円か、確かめる', m:1, d:'数字が近づいているのを見ると、踏みとどまれます。' }
+  ]
+};
+
+/* あずける時間のめやす（金額の上限 → 時間）。設定で変更できる */
+const DEFAULT_RULES = [
+  { max: 3000,   hours: 24 },
+  { max: 10000,  hours: 72 },
+  { max: 30000,  hours: 168 },
+  { max: 100000, hours: 336 },
+  { max: null,   hours: 720 }
+];
+
+/* 選べる時間の候補 */
+const COOL_CHOICES = [
+  { h: 1,   t: '1時間' },
+  { h: 6,   t: '6時間' },
+  { h: 12,  t: '12時間' },
+  { h: 24,  t: '1日' },
+  { h: 72,  t: '3日' },
+  { h: 168, t: '1週間' },
+  { h: 336, t: '2週間' },
+  { h: 720, t: '1ヶ月' },
+  { h: 2160,t: '3ヶ月' }
+];
+
+/* ── 保存と読み込み ───────────────────── */
+function blank(){
+  return {
+    version:1,
+    items:[],            /* 預けたもの・決めたもの */
+    goal:null,           /* いまの貯金目標 {name, amount, baseline, createdAt} */
+    goalsDone:[],        /* 達成した目標 {name, amount, achievedAt} */
+    relief:[],           /* 気晴らしの記録 {ts, mood, idea} */
+    settings:{ budget:0, theme:'auto', rules:DEFAULT_RULES.map(r=>({...r})) }
+  };
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return blank();
+    const d = JSON.parse(raw);
+    const base = blank();
+    d.items = Array.isArray(d.items) ? d.items : [];
+    d.goal = (d.goal && typeof d.goal === 'object') ? d.goal : null;
+    d.goalsDone = Array.isArray(d.goalsDone) ? d.goalsDone : [];
+    d.relief = Array.isArray(d.relief) ? d.relief : [];
+    d.settings = Object.assign(base.settings, d.settings || {});
+    if(!Array.isArray(d.settings.rules) || d.settings.rules.length !== DEFAULT_RULES.length){
+      d.settings.rules = DEFAULT_RULES.map(r=>({...r}));
+    }
+    return d;
+  }catch(e){
+    return blank();
+  }
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(db)); }
+  catch(e){ toast('保存できませんでした'); }
+}
+let db = load();
+
+/* ── 小さな道具 ───────────────────────── */
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const yen = n => Math.round(n||0).toLocaleString('ja-JP');
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+/* 星は「塗り」と「空」で色を分けて出す */
+const stars = n => '★'.repeat(n) + (n < 5 ? `<s>${'★'.repeat(5-n)}</s>` : '');
+
+function toast(msg){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+/* 残り時間を日本語にする */
+function remainParts(ms){
+  if(ms <= 0) return { big:'0', unit:'', text:'あずけ終わり' };
+  const m = Math.floor(ms / 60000);
+  const d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mi = m % 60;
+  if(d > 0) return { text:`あと <b class="num">${d}</b>日 <b class="num">${h}</b>時間` };
+  if(h > 0) return { text:`あと <b class="num">${h}</b>時間 <b class="num">${mi}</b>分` };
+  return { text:`あと <b class="num">${Math.max(1, mi)}</b>分` };
+}
+function hoursText(h){
+  if(h < 24) return `${h}時間`;
+  if(h % 720 === 0) return `${h/720}ヶ月`;
+  if(h % 168 === 0) return `${h/168}週間`;
+  return `${Math.round(h/24)}日`;
+}
+const WEEK = ['日','月','火','水','木','金','土'];
+function ymd(ts){
+  const d = new Date(ts);
+  return `${d.getMonth()+1}月${d.getDate()}日`;
+}
+function ymdw(ts){
+  const d = new Date(ts);
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${WEEK[d.getDay()]}）`;
+}
+function ymdShort(ts){
+  const d = new Date(ts);
+  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+}
+function monthKey(ts){
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+/* 金額から、あずける時間（時間単位）を決める */
+function baseHours(price){
+  const rules = db.settings.rules;
+  for(const r of rules){
+    if(r.max === null || price <= r.max) return r.hours;
+  }
+  return rules[rules.length-1].hours;
+}
+function suggestHours(price, kind, signCount){
+  let h = baseHours(price);
+  if(kind === 'need') h = Math.max(1, Math.round(h / 2));
+  if(signCount >= 3) h = h * 2;
+  /* 選択肢の中でいちばん近いものに寄せる */
+  let best = COOL_CHOICES[0].h, diff = Infinity;
+  for(const c of COOL_CHOICES){
+    const d = Math.abs(c.h - h);
+    if(d < diff){ diff = d; best = c.h; }
+  }
+  return best;
+}
+
+/* ── 状態のしぼり込み ─────────────────── */
+const now = () => Date.now();
+const waiting = () => db.items.filter(i => i.status === 'waiting' && i.readyAt >  now())
+                              .sort((a,b) => a.readyAt - b.readyAt);
+const ready   = () => db.items.filter(i => i.status === 'waiting' && i.readyAt <= now())
+                              .sort((a,b) => a.readyAt - b.readyAt);
+const decided = () => db.items.filter(i => i.status === 'bought' || i.status === 'skipped')
+                              .sort((a,b) => b.decidedAt - a.decidedAt);
+
+/* ── がまん貯金の計算 ─────────────────────
+   貯金 ＝ やめた金額の合計 −（達成した目標で使った分） */
+const skippedTotal = () => db.items.filter(i => i.status === 'skipped').reduce((s,i) => s + i.price, 0);
+const usedTotal    = () => db.goalsDone.reduce((s,g) => s + g.amount, 0);
+const balance      = () => Math.max(0, skippedTotal() - usedTotal());
+
+/* いまの目標の進みぐあい */
+function goalState(){
+  const g = db.goal;
+  if(!g) return null;
+  const saved = Math.max(0, balance() - (g.baseline || 0));
+  const rest  = Math.max(0, g.amount - saved);
+  return { goal:g, saved, rest, pct: Math.min(100, saved / g.amount * 100), done: saved >= g.amount };
+}
+
+/* ═══ 画面の描画 ═══════════════════════ */
+let view = 'wait';
+
+function render(){
+  document.documentElement.dataset.theme = db.settings.theme === 'auto' ? '' : db.settings.theme;
+  renderSavings();
+  renderTabs();
+  if(view === 'wait')  renderWait();
+  if(view === 'judge') renderJudgeList();
+  if(view === 'stat')  renderStat();
+  if(view === 'log')   renderLog();
+}
+
+function renderSavings(){
+  const skipped = db.items.filter(i => i.status === 'skipped');
+  $('#savTotal').innerHTML = `${yen(balance())}<small>円</small>`;
+  const side = $('#savSide');
+  if(skipped.length === 0){
+    side.textContent = '「やめておく」を選ぶと、その金額がここにたまります';
+  }else{
+    const mk = monthKey(now());
+    const m = skipped.filter(i => monthKey(i.decidedAt) === mk);
+    let t = `これまで ${skipped.length}件 やめました（今月は ${yen(m.reduce((s,i)=>s+i.price,0))}円）`;
+    if(db.goalsDone.length) t += `／目標を ${db.goalsDone.length}回 達成`;
+    side.textContent = t;
+  }
+
+  /* 目標のバー */
+  const box = $('#savGoal');
+  const gs = goalState();
+  if(!gs){
+    box.innerHTML = `<button class="goal-set" type="button" id="btnGoalNew">🎯 貯金の目標を決める</button>`;
+  }else if(gs.done){
+    box.innerHTML = `<div class="goal-mini done">
+        <div class="gt"><span>🎉 ${esc(gs.goal.name)}</span><small>達成！</small></div>
+        <div class="gbar"><i style="width:100%"></i></div>
+        <p class="gs">目標の ${yen(gs.goal.amount)}円 がたまりました</p>
+      </div>
+      <button class="goal-done-btn" type="button" id="btnGoalAchieve">この目標に使う（貯金からおろす）</button>`;
+  }else{
+    box.innerHTML = `<div class="goal-mini">
+        <div class="gt"><span>🎯 ${esc(gs.goal.name)}</span><small class="num">${yen(gs.goal.amount)}円</small></div>
+        <div class="gbar"><i style="width:${gs.pct.toFixed(1)}%"></i></div>
+        <p class="gs">あと <span class="num">${yen(gs.rest)}</span>円（${Math.floor(gs.pct)}% たまりました）</p>
+      </div>`;
+  }
+}
+
+function renderTabs(){
+  $$('.tab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === view)));
+  $$('.view').forEach(s => { s.hidden = (s.id !== 'view-' + view); });
+  const r = ready().length, w = waiting().length;
+  const bj = $('#bJudge'), bw = $('#bWait');
+  bj.hidden = r === 0; bj.textContent = r;
+  bw.hidden = w === 0; bw.textContent = w;
+}
+
+/* あずけ中 */
+function renderWait(){
+  const list = waiting();
+  const box = $('#waitList');
+  if(list.length === 0){
+    box.innerHTML = `<div class="empty">
+      <div class="ic" aria-hidden="true">📦</div>
+      <span class="big">あずかり中のものはありません</span>
+      <p>欲しいものが浮かんだら、買う前に下のボタンから預けてください。</p></div>`;
+    $('#howto').open = db.items.length === 0;
+    return;
+  }
+  box.innerHTML = list.map(i => {
+    const total = i.readyAt - i.createdAt;
+    const done  = Math.min(100, Math.max(0, (now() - i.createdAt) / total * 100));
+    return `<article class="item" data-id="${i.id}">
+      <div class="item-top"><span aria-hidden="true">📦</span>あずかり中</div>
+      <div class="item-body">
+        <p class="name">${esc(i.name)}</p>
+        <div class="price-row">
+          <span class="price num">${yen(i.price)}<small>円</small></span>
+          <span class="want-inline">${stars(i.want)}</span>
+        </div>
+        <div class="tags">
+          ${i.kind === 'need' ? '<span class="chip need">必要なもの</span>' : ''}
+          <span class="chip">${esc(i.tag || 'その他')}</span>
+          ${i.signs && i.signs.length ? `<span class="chip sign">衝動サイン ${i.signs.length}つ</span>` : ''}
+          ${i.shop ? `<span class="chip">${esc(i.shop)}</span>` : ''}
+          ${i.url ? `<a class="chip link" href="${esc(i.url)}" target="_blank" rel="noopener">商品ページ ↗</a>` : ''}
+        </div>
+        ${i.reason ? `<div class="quote"><div class="qh">📝 なぜ欲しいのか</div><p>${esc(i.reason)}</p></div>` : ''}
+        <div class="timer">
+          <p class="big">${remainParts(i.readyAt - now()).text}</p>
+          <div class="bar"><i style="width:${done.toFixed(1)}%"></i></div>
+          <div class="bar-ends"><span>預けた ${ymd(i.createdAt)}</span><span>決める ${ymd(i.readyAt)}</span></div>
+        </div>
+        <div class="acts">
+          <button class="btn green" data-act="skip">やめる<span>${yen(i.price)}円をがまん貯金に入れます</span></button>
+          <div class="btn-row">
+            <button class="btn small" data-act="extend">もっと預ける<span>＋7日</span></button>
+            <button class="btn small" data-act="now">待たずに買う</button>
+          </div>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+/* 決める（判定待ち） */
+function renderJudgeList(){
+  const list = ready();
+  const box = $('#judgeList');
+  if(list.length === 0){
+    box.innerHTML = `<div class="empty">
+      <div class="ic" aria-hidden="true">☕</div>
+      <span class="big">いま決めるものはありません</span>
+      <p>あずける時間が過ぎたものが、ここに出てきます。</p></div>`;
+    return;
+  }
+  box.innerHTML = list.map(i => `
+    <article class="item ready" data-id="${i.id}">
+      <div class="item-top"><span aria-hidden="true">⏰</span>決める時間になりました</div>
+      <div class="item-body">
+        <p class="name">${esc(i.name)}</p>
+        <div class="price-row">
+          <span class="price num">${yen(i.price)}<small>円</small></span>
+          <span class="want-inline">${stars(i.want)}</span>
+        </div>
+        <div class="tags">
+          <span class="chip">${esc(i.tag || 'その他')}</span>
+          <span class="chip">${ymd(i.createdAt)}から ${hoursText(Math.round((i.readyAt-i.createdAt)/HOUR))} あずけました</span>
+          ${i.url ? `<a class="chip link" href="${esc(i.url)}" target="_blank" rel="noopener">商品ページ ↗</a>` : ''}
+        </div>
+        ${i.reason ? `<div class="quote"><div class="qh">📝 預けたときに、自分が書いた理由</div><p>${esc(i.reason)}</p></div>` : ''}
+        <div class="acts">
+          <button class="btn amber" data-act="judge">買うか決める</button>
+        </div>
+      </div>
+    </article>`).join('');
+}
+
+/* 記録 */
+function renderStat(){
+  const mk = monthKey(now());
+  const mine = db.items.filter(i => i.decidedAt && monthKey(i.decidedAt) === mk);
+  const mb = mine.filter(i => i.status === 'bought');
+  const ms = mine.filter(i => i.status === 'skipped');
+  const mbSum = mb.reduce((s,i)=>s+i.price,0);
+  $('#mSkip').innerHTML = `${yen(ms.reduce((s,i)=>s+i.price,0))}<small>円</small>`;
+  $('#mSkipN').textContent = `${ms.length}件 やめました`;
+  $('#mBuy').innerHTML  = `${yen(mbSum)}<small>円</small>`;
+  $('#mBuyN').textContent  = `${mb.length}件 買いました`;
+
+  renderGoalArea();
+  renderReliefArea();
+
+  /* 予算バー */
+  const bud = db.settings.budget || 0;
+  const bar = $('#budgetBar');
+  if(bud > 0){
+    const pct = Math.min(100, mbSum / bud * 100);
+    bar.classList.toggle('over', mbSum > bud);
+    bar.querySelector('i').style.width = pct.toFixed(1) + '%';
+    $('#budgetText').textContent = mbSum > bud
+      ? `予算 ${yen(bud)}円を ${yen(mbSum - bud)}円 こえています`
+      : `${yen(bud)}円のうち ${yen(mbSum)}円 つかいました（あと ${yen(bud - mbSum)}円）`;
+  }else{
+    bar.querySelector('i').style.width = '0%';
+    bar.classList.remove('over');
+    $('#budgetText').textContent = '予算はまだ決めていません（⚙ から決められます）';
+  }
+
+  /* 月ごとの棒グラフ（直近6ヶ月） */
+  const months = [];
+  const d0 = new Date();
+  for(let k=5;k>=0;k--){
+    const d = new Date(d0.getFullYear(), d0.getMonth()-k, 1);
+    months.push({ key: monthKey(d.getTime()), label: `${d.getMonth()+1}月`, b:0, s:0, now:k===0 });
+  }
+  db.items.forEach(i => {
+    if(!i.decidedAt) return;
+    const m = months.find(x => x.key === monthKey(i.decidedAt));
+    if(!m) return;
+    if(i.status === 'bought') m.b += i.price;
+    if(i.status === 'skipped') m.s += i.price;
+  });
+  const top = Math.max(1, ...months.map(m => m.b + m.s));
+  $('#chart').innerHTML = months.map(m => {
+    const hb = m.b / top * 100, hs = m.s / top * 100;
+    return `<div class="col${m.now ? ' now' : ''}">
+      <div class="stack">
+        ${m.b ? `<div class="seg b" style="height:${hb}%" title="買った ${yen(m.b)}円"></div>` : ''}
+        ${m.s ? `<div class="seg s" style="height:${hs}%" title="がまん ${yen(m.s)}円"></div>` : ''}
+      </div>
+      <div class="cap">${m.label}</div>
+    </div>`;
+  }).join('');
+
+  /* ひと呼吸の効きめ */
+  const all = db.items.filter(i => i.decidedAt);
+  const ins = $('#insight');
+  if(all.length === 0){
+    ins.textContent = 'まだ記録がありません。まずはひとつ預けてみてください。';
+  }else{
+    const sk = all.filter(i => i.status === 'skipped');
+    const rate = Math.round(sk.length / all.length * 100);
+    const down = all.filter(i => typeof i.wantAfter === 'number' && i.wantAfter < i.want).length;
+    const imp  = all.filter(i => i.impulseBuy).length;
+    let t = `これまで決めた ${all.length}件のうち、${sk.length}件（${rate}%）をやめておけました。`;
+    if(down > 0) t += ` あずけているあいだに、${down}件は欲しい気持ちが下がりました。`;
+    if(imp > 0)  t += ` 待たずに買ったのは ${imp}件です。`;
+    ins.textContent = t;
+  }
+
+  /* 買ったものの内訳 */
+  const bought = db.items.filter(i => i.status === 'bought');
+  const rank = $('#tagRank');
+  if(bought.length === 0){
+    rank.innerHTML = '<p class="n">まだ「買った」記録がありません。</p>';
+  }else{
+    const by = {};
+    bought.forEach(i => { const t = i.tag || 'その他'; by[t] = (by[t]||0) + i.price; });
+    const rows = Object.entries(by).sort((a,b)=>b[1]-a[1]);
+    const max = rows[0][1];
+    rank.innerHTML = rows.map(([t,v]) => `<div class="row">
+      <div class="nm">${esc(t)}</div>
+      <div class="tr"><i style="width:${(v/max*100).toFixed(1)}%"></i></div>
+      <div class="vl num">${yen(v)}円</div>
+    </div>`).join('');
+  }
+}
+
+/* 記録タブ：目標のところ */
+function renderGoalArea(){
+  const box = $('#goalArea');
+  const gs = goalState();
+  let html = '';
+
+  if(!gs){
+    html += `<div class="empty" style="margin:0">
+      <div class="ic" aria-hidden="true">🎯</div>
+      <span class="big">目標はまだありません</span>
+      <p>「北海道旅行」「新しい冷蔵庫」など、がまんのごほうびを決めておくと続きます。</p>
+      <button class="btn green" type="button" data-goal="new" style="margin-top:12px">目標を決める</button>
+    </div>`;
+  }else{
+    /* 1ヶ月あたり、どれくらい貯まっているか＝あと何ヶ月かのめやす */
+    /* 始めたばかりだと当てにならないので、2週間たってから出す */
+    const days = Math.max(1, (now() - gs.goal.createdAt) / DAY);
+    const perMonth = gs.saved / days * 30;
+    const months = (gs.rest > 0 && perMonth > 0 && days >= 14) ? Math.ceil(gs.rest / perMonth) : 0;
+    html += `<div class="panel goal-panel">
+      <p class="gname">🎯 ${esc(gs.goal.name)}</p>
+      <p class="gamt">目標 <span class="num">${yen(gs.goal.amount)}</span>円・${ymdShort(gs.goal.createdAt)}から</p>
+      <p class="gbig num">${yen(gs.saved)}<small>円 たまりました</small></p>
+      <div class="bar${gs.done ? '' : ''}"><i style="width:${gs.pct.toFixed(1)}%"></i></div>
+      <div class="bar-ends"><span>${Math.floor(gs.pct)}%</span><span>${gs.done ? '達成！' : `あと ${yen(gs.rest)}円`}</span></div>
+      ${gs.done
+        ? `<button class="btn green" type="button" data-goal="achieve" style="margin-top:13px">この目標に使う<span>貯金からおろして、達成にします</span></button>`
+        : (months > 0 ? `<p class="sec-note" style="margin-top:10px">いまのペースだと、あと ${months}ヶ月ほどで届きそうです。</p>` : '')}
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn small" type="button" data-goal="edit">目標を変える</button>
+        <button class="btn small" type="button" data-goal="cancel">目標をやめる</button>
+      </div>
+    </div>`;
+  }
+
+  if(db.goalsDone.length){
+    html += `<h2 class="sec">🏅 達成した目標</h2>
+      <div class="panel goal-hist" style="margin-top:12px">${
+        db.goalsDone.slice().reverse().map(g =>
+          `<div class="row"><b>${esc(g.name)}</b><span class="num">${yen(g.amount)}円・${ymdShort(g.achievedAt)}</span></div>`
+        ).join('')}</div>`;
+  }
+  box.innerHTML = html;
+}
+
+/* 記録タブ：気晴らしのところ */
+function renderReliefArea(){
+  const box = $('#reliefArea');
+  const all = db.relief;
+  if(all.length === 0){
+    box.innerHTML = `<p class="n">まだ記録がありません。買いたくなったら、画面の下の「🫧 気晴らし」を押してみてください。</p>`;
+    return;
+  }
+  const mk = monthKey(now());
+  const m = all.filter(r => monthKey(r.ts) === mk).length;
+  const recent = all.slice(-5).reverse();
+  box.innerHTML = `
+    <p class="k" style="font-size:13px;font-weight:700;margin:0">🫧 買わずに気分を切り替えた回数</p>
+    <p class="v num" style="font-size:26px;font-weight:800;margin:2px 0 0">${all.length}<small style="font-size:14px;margin-left:2px">回</small></p>
+    <p class="n" style="font-size:12.5px;color:var(--ink-soft);margin:0;font-weight:600">今月は ${m}回</p>
+    <div class="goal-hist" style="margin-top:10px">${
+      recent.map(r => `<div class="row"><b>${esc(r.idea)}</b><span>${ymdShort(r.ts)}</span></div>`).join('')}</div>`;
+}
+
+/* 履歴 */
+function renderLog(){
+  const list = decided();
+  const box = $('#logList');
+  if(list.length === 0){
+    box.innerHTML = `<div class="empty">
+      <div class="ic" aria-hidden="true">📋</div>
+      <span class="big">まだ履歴はありません</span>
+      <p>「買う」「やめる」を決めると、ここに残ります。</p></div>`;
+    return;
+  }
+  let html = '', last = '';
+  list.forEach(i => {
+    const mk = monthKey(i.decidedAt);
+    if(mk !== last){
+      if(last) html += '</div>';
+      const [y,m] = mk.split('-');
+      html += `<div class="log"><div class="month">${y}年 ${Number(m)}月</div>`;
+      last = mk;
+    }
+    const isBuy = i.status === 'bought';
+    html += `<div class="row" data-id="${i.id}">
+      <div class="mark ${isBuy ? 'b' : 's'}">${isBuy ? '買った' : 'やめた'}</div>
+      <div class="nm">${esc(i.name)}
+        <span>${ymdShort(i.decidedAt)}・${esc(i.tag||'その他')}${i.impulseBuy ? '・待たずに購入' : ''}</span>
+      </div>
+      <div class="pr num">${yen(i.price)}<small>円</small></div>
+      <button class="del" type="button" data-act="del" aria-label="この記録を消す">×</button>
+    </div>`;
+  });
+  html += '</div>';
+  box.innerHTML = html;
+}
+
+/* ═══ 追加ダイアログ ═══════════════════ */
+const add = { tag:'その他', kind:'want', want:4, signs:[], touchedCool:false };
+
+function buildAddForm(){
+  $('#fTags').innerHTML = TAGS.map(t =>
+    `<button type="button" data-tag="${esc(t)}" aria-pressed="${t===add.tag}">${esc(t)}</button>`).join('');
+  $('#fWant').innerHTML = [1,2,3,4,5].map(n =>
+    `<button type="button" data-want="${n}" class="${n<=add.want?'on':''}" aria-label="★${n}">★</button>`).join('');
+  $('#fSigns').innerHTML = SIGNS.map((s,k) =>
+    `<label><input type="checkbox" data-sign="${k}"><span>${esc(s)}</span></label>`).join('');
+  $('#fCool').innerHTML = COOL_CHOICES.map(c =>
+    `<option value="${c.h}">${c.t}</option>`).join('');
+}
+
+function openAdd(){
+  add.tag='その他'; add.kind='want'; add.want=4; add.signs=[]; add.touchedCool=false;
+  $('#formAdd').reset();
+  buildAddForm();
+  $$('#fKind button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kind === 'want')));
+  $('#fWantNote').textContent = WANT_WORDS[4];
+  $('#fRelief').hidden = true;
+  refreshSigns();
+  refreshCool();
+  $('#dlgAdd').showModal();
+  setTimeout(()=>$('#fName').focus(), 60);
+}
+
+function refreshSigns(){
+  const n = add.signs.length;
+  const el = $('#fSignNote');
+  el.classList.toggle('hot', n >= 3);
+  if(n === 0) el.textContent = 'あてはまるものがなければ、そのままで大丈夫です。';
+  else if(n < 3) el.textContent = `衝動のサインが ${n}つ つきました。`;
+  else el.textContent = `衝動のサインが ${n}つ。今日は見送りどきかもしれません。あずける時間を2倍にします。`;
+}
+
+function refreshCool(){
+  const price = Number($('#fPrice').value || 0);
+  const sug = suggestHours(price, add.kind, add.signs.length);
+  if(!add.touchedCool) $('#fCool').value = String(sug);
+  const cur = Number($('#fCool').value) || sug;
+  $('#fCoolDate').textContent = ymdw(now() + cur * HOUR);
+  const parts = [`${yen(price)}円 なら ${hoursText(baseHours(price))}`];
+  if(add.kind === 'need') parts.push('必要なものなので半分');
+  if(add.signs.length >= 3) parts.push('衝動サインが3つ以上なので2倍');
+  $('#fCoolWhy').textContent = `${parts.join('・')} → おすすめは ${hoursText(sug)}です。`;
+}
+
+function submitAdd(e){
+  e.preventDefault();
+  const name  = $('#fName').value.trim();
+  const price = Math.max(0, Math.round(Number($('#fPrice').value || 0)));
+  if(!name){ toast('名前を入れてください'); return; }
+  const hours = Number($('#fCool').value) || 24;
+  const t = now();
+  db.items.push({
+    id: uid(),
+    name,
+    price,
+    shop: $('#fShop').value.trim(),
+    url:  $('#fUrl').value.trim(),
+    reason: $('#fReason').value.trim(),
+    tag: add.tag,
+    kind: add.kind,
+    want: add.want,
+    signs: add.signs.slice(),
+    coolHours: hours,
+    createdAt: t,
+    readyAt: t + hours * HOUR,
+    status: 'waiting',
+    decidedAt: null,
+    wantAfter: null,
+    notified: false
+  });
+  save();
+  $('#dlgAdd').close();
+  view = 'wait';
+  render();
+  toast(`${ymd(t + hours * HOUR)}まで あずかります`);
+}
+
+/* ═══ 判定ダイアログ ═══════════════════ */
+let judgeId = null, judgeWant = 3;
+
+function openJudge(id){
+  const i = db.items.find(x => x.id === id);
+  if(!i) return;
+  judgeId = id;
+  judgeWant = i.want;
+  $('#jName').textContent  = i.name;
+  $('#jPrice').innerHTML   = `${yen(i.price)}<small>円</small>`;
+  $('#jSkipSub').textContent = `${yen(i.price)}円をがまん貯金に入れます`;
+  const q = $('#jReason');
+  if(i.reason){ q.hidden = false; $('#jReasonText').textContent = i.reason; } else { q.hidden = true; }
+  $('#jWasStars').innerHTML = stars(i.want);
+  drawJudgeStars();
+  $('#dlgJudge').showModal();
+}
+
+function drawJudgeStars(){
+  $('#jWant').innerHTML = [1,2,3,4,5].map(n =>
+    `<button type="button" data-jwant="${n}" class="${n<=judgeWant?'on':''}" aria-label="★${n}">★</button>`).join('');
+  $('#jWantNote').textContent = WANT_WORDS[judgeWant];
+  $('#jNowStars').innerHTML = stars(judgeWant);
+  const i = db.items.find(x => x.id === judgeId);
+  const hint = $('#jHint');
+  if(!i){ hint.textContent = ''; return; }
+  if(judgeWant < i.want)      hint.textContent = '預ける前より下がりました。いまの気持ちを大事にしてください。';
+  else if(judgeWant > i.want) hint.textContent = '時間をおいても上がりました。本当に必要なものかもしれません。';
+  else                        hint.textContent = '気持ちは変わっていません。';
+}
+
+function decide(id, status, opts = {}){
+  const i = db.items.find(x => x.id === id);
+  if(!i) return;
+  i.status = status;
+  i.decidedAt = now();
+  if(typeof opts.wantAfter === 'number') i.wantAfter = opts.wantAfter;
+  if(opts.impulse) i.impulseBuy = true;
+  save();
+  render();
+  if(status !== 'skipped'){
+    toast(`「${i.name}」を買ったと記録しました`);
+    return;
+  }
+  /* やめたときは、目標にどれだけ近づいたかも伝える */
+  const gs = goalState();
+  let msg = `よく我慢しました。${yen(i.price)}円 貯金へ`;
+  if(gs && gs.done)      msg = `🎉 ${gs.goal.name} の目標に届きました！`;
+  else if(gs)            msg += `／${gs.goal.name}まで あと ${yen(gs.rest)}円`;
+  toast(msg);
+}
+
+function snooze(id, days){
+  const i = db.items.find(x => x.id === id);
+  if(!i) return;
+  i.readyAt = Math.max(now(), i.readyAt) + days * DAY;
+  i.notified = false;
+  save();
+  render();
+  toast(`${ymd(i.readyAt)}まで あずかります`);
+}
+
+/* ═══ 目標 ═══════════════════════════ */
+let goalBase = 'use';      /* use = いまの貯金もあてる／keep = これから貯める分だけ */
+let goalEditing = false;
+
+function openGoal(edit){
+  goalEditing = !!edit && !!db.goal;
+  $('#goalTitle').textContent = goalEditing ? '目標を変える' : '貯金の目標を決める';
+  $('#gDelete').hidden = !goalEditing;
+  $('#gBaseField').hidden = goalEditing;   /* 途中で数え方は変えない */
+  if(goalEditing){
+    $('#gName').value = db.goal.name;
+    $('#gAmount').value = db.goal.amount;
+  }else{
+    $('#formGoal').reset();
+    goalBase = 'use';
+  }
+  $$('#gBase button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.base === goalBase)));
+  $('#gBaseUse').textContent = `いまの ${yen(balance())}円 から数える`;
+  refreshGoalPreview();
+  $('#dlgGoal').showModal();
+  setTimeout(()=>$('#gName').focus(), 60);
+}
+
+function refreshGoalPreview(){
+  const amt = Math.max(0, Math.round(Number($('#gAmount').value || 0)));
+  const start = goalEditing
+    ? Math.max(0, balance() - (db.goal.baseline || 0))
+    : (goalBase === 'use' ? balance() : 0);
+  const rest = Math.max(0, amt - start);
+  $('#gPreview').textContent = amt === 0 ? '—' : (rest === 0 ? 'もう届いています！' : `あと ${yen(rest)}円`);
+  $('#gPreviewWhy').textContent = amt === 0
+    ? '金額を入れると、あと何円かを計算します。'
+    : `いまの分 ${yen(start)}円 に、これから「やめておく」たびに積み上がっていきます。`;
+}
+
+function submitGoal(e){
+  e.preventDefault();
+  const name = $('#gName').value.trim();
+  const amount = Math.max(1, Math.round(Number($('#gAmount').value || 0)));
+  if(!name){ toast('目標の名前を入れてください'); return; }
+  if(goalEditing){
+    db.goal.name = name;
+    db.goal.amount = amount;
+  }else{
+    db.goal = { name, amount, baseline: goalBase === 'use' ? 0 : balance(), createdAt: now() };
+  }
+  save();
+  $('#dlgGoal').close();
+  render();
+  toast(goalEditing ? '目標を変えました' : `「${name}」を目標にしました`);
+}
+
+function achieveGoal(){
+  const gs = goalState();
+  if(!gs || !gs.done) return;
+  if(!confirm(`「${gs.goal.name}」を達成にします。\n貯金から ${yen(gs.goal.amount)}円 を使ったことにして、あまった分は次の目標に引きつぎます。`)) return;
+  db.goalsDone.push({ name: gs.goal.name, amount: gs.goal.amount, achievedAt: now() });
+  db.goal = null;
+  save(); render();
+  toast('おめでとうございます！ 目標を達成しました 🎉');
+}
+
+function cancelGoal(){
+  if(!db.goal) return;
+  if(!confirm(`「${db.goal.name}」の目標をやめますか？\n（たまったお金はそのまま残ります）`)) return;
+  db.goal = null;
+  save(); render();
+  toast('目標をやめました');
+}
+
+/* ═══ 気晴らし ═══════════════════════ */
+let reliefMood = null, reliefOffset = 0, reliefPicks = [], reliefPicked = null;
+
+function openRelief(){
+  reliefMood = null; reliefOffset = 0; reliefPicks = []; reliefPicked = null;
+  $('#moodGrid').innerHTML = MOODS.map(m =>
+    `<button type="button" data-mood="${m.k}"><span class="ic" aria-hidden="true">${m.ic}</span>${m.t}</button>`).join('');
+  $('#reliefStep1').hidden = false;
+  $('#reliefStep2').hidden = true;
+  $('#reliefFoot').hidden  = true;
+  $('#dlgRelief').showModal();
+}
+
+function showIdeas(k){
+  const mood = MOODS.find(m => m.k === k);
+  if(!mood) return;
+  reliefMood = k;
+  reliefOffset = Math.floor(Math.random() * IDEAS[k].length);
+  $('#reliefMoodName').textContent = `${mood.ic} ${mood.t}ときは`;
+  drawIdeas();
+  $('#reliefStep1').hidden = true;
+  $('#reliefStep2').hidden = false;
+  $('#reliefFoot').hidden  = false;
+}
+
+function drawIdeas(){
+  const list = IDEAS[reliefMood];
+  reliefPicks = [0,1,2].map(n => list[(reliefOffset + n) % list.length]);
+  reliefPicked = reliefPicks[0];
+  $('#ideaList').innerHTML = reliefPicks.map((p,i) =>
+    `<button class="idea" type="button" data-i="${i}" aria-pressed="${i===0}">
+      <span class="im">${p.m}分ほど</span>
+      <p class="it">${esc(p.t)}</p>
+      <p class="id">${esc(p.d)}</p>
+    </button>`).join('');
+}
+
+function reliefRecord(){
+  if(!reliefPicked) return;
+  db.relief.push({ ts: now(), mood: reliefMood, idea: reliefPicked.t });
+  save(); render();
+  $('#dlgRelief').close();
+  toast('えらい！ 買わずにやり過ごせました 🫧');
+}
+
+/* ═══ 設定 ═══════════════════════════ */
+function openSettings(){
+  $('#sBudget').value = db.settings.budget || '';
+  $('#sTheme').value  = db.settings.theme || 'auto';
+  $('#sRules').innerHTML = db.settings.rules.map((r,k) => {
+    const label = r.max === null
+      ? `${yen(db.settings.rules[k-1].max)}円 より上`
+      : `${k === 0 ? '' : yen(db.settings.rules[k-1].max) + '円 〜 '}${yen(r.max)}円${k === 0 ? ' まで' : ''}`;
+    return `<div class="set-row"><span>${label}</span>
+      <select class="in" data-rule="${k}">${COOL_CHOICES.map(c =>
+        `<option value="${c.h}" ${c.h===r.hours?'selected':''}>${c.t}</option>`).join('')}</select></div>`;
+  }).join('');
+  const nb = $('#sNotify');
+  if(!('Notification' in window)){ nb.textContent = '非対応'; nb.disabled = true; }
+  else if(Notification.permission === 'granted'){ nb.textContent = '許可ずみ'; nb.disabled = true; }
+  else if(Notification.permission === 'denied'){ nb.textContent = 'ブラウザで拒否中'; nb.disabled = true; }
+  else { nb.textContent = '許可する'; nb.disabled = false; }
+  $('#dlgSet').showModal();
+}
+
+function exportJson(){
+  const blob = new Blob([JSON.stringify(db, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `hitokokyuu-backup-${monthKey(now())}-${new Date().getDate()}.json`;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  toast('バックアップを書き出しました');
+}
+
+function importJson(file){
+  const fr = new FileReader();
+  fr.onload = () => {
+    try{
+      const d = JSON.parse(String(fr.result));
+      if(!d || !Array.isArray(d.items)) throw new Error('形式が違います');
+      if(!confirm(`いまの記録を、読み込んだ ${d.items.length}件で置きかえます。よろしいですか？`)) return;
+      db = Object.assign(blank(), d);
+      db.settings = Object.assign(blank().settings, d.settings || {});
+      save(); render();
+      toast('読み込みました');
+    }catch(err){
+      toast('読み込めませんでした');
+    }
+  };
+  fr.readAsText(file);
+}
+
+/* ═══ あずけ終わりの見はり（通知）═════════ */
+function checkReady(){
+  let changed = false;
+  db.items.forEach(i => {
+    if(i.status === 'waiting' && i.readyAt <= now() && !i.notified){
+      i.notified = true; changed = true;
+      if('Notification' in window && Notification.permission === 'granted'){
+        try{
+          new Notification('ひと呼吸', { body: `「${i.name}」を決める時間になりました`, icon: 'icons/icon-192.png', tag: i.id });
+        }catch(e){ /* 通知が出せなくても動作は続ける */ }
+      }
+    }
+  });
+  if(changed) save();
+  render();
+}
+
+/* ═══ 画面の操作 ═══════════════════════ */
+document.addEventListener('click', (ev) => {
+  const t = ev.target.closest('[data-close]');
+  if(t){ $('#' + t.dataset.close).close(); return; }
+});
+
+$$('.tab').forEach(b => b.addEventListener('click', () => {
+  view = b.dataset.view;
+  render();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}));
+
+$('#btnAdd').addEventListener('click', openAdd);
+$('#btnSettings').addEventListener('click', openSettings);
+$('#btnRelief').addEventListener('click', openRelief);
+
+/* 目標の操作（貯金カードの中と、記録タブ） */
+$('#savGoal').addEventListener('click', e => {
+  if(e.target.closest('#btnGoalNew'))     openGoal(false);
+  if(e.target.closest('#btnGoalAchieve')) achieveGoal();
+});
+$('#goalArea').addEventListener('click', e => {
+  const b = e.target.closest('[data-goal]'); if(!b) return;
+  if(b.dataset.goal === 'new')     openGoal(false);
+  if(b.dataset.goal === 'edit')    openGoal(true);
+  if(b.dataset.goal === 'achieve') achieveGoal();
+  if(b.dataset.goal === 'cancel')  cancelGoal();
+});
+$('#gBase').addEventListener('click', e => {
+  const b = e.target.closest('[data-base]'); if(!b) return;
+  goalBase = b.dataset.base;
+  $$('#gBase button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  refreshGoalPreview();
+});
+$('#gAmount').addEventListener('input', refreshGoalPreview);
+$('#formGoal').addEventListener('submit', submitGoal);
+$('#gDelete').addEventListener('click', () => { $('#dlgGoal').close(); cancelGoal(); });
+
+/* 気晴らしの操作 */
+$('#moodGrid').addEventListener('click', e => {
+  const b = e.target.closest('[data-mood]'); if(!b) return;
+  showIdeas(b.dataset.mood);
+});
+$('#ideaList').addEventListener('click', e => {
+  const b = e.target.closest('[data-i]'); if(!b) return;
+  reliefPicked = reliefPicks[Number(b.dataset.i)];
+  $$('#ideaList .idea').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+});
+$('#reliefMore').addEventListener('click', () => { reliefOffset += 3; drawIdeas(); });
+$('#reliefBack').addEventListener('click', () => {
+  $('#reliefStep1').hidden = false;
+  $('#reliefStep2').hidden = true;
+  $('#reliefFoot').hidden  = true;
+});
+$('#reliefDone').addEventListener('click', reliefRecord);
+$('#fRelief').addEventListener('click', openRelief);
+
+/* 追加フォームの操作 */
+$('#fTags').addEventListener('click', e => {
+  const b = e.target.closest('[data-tag]'); if(!b) return;
+  add.tag = b.dataset.tag;
+  $$('#fTags button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+});
+$('#fKind').addEventListener('click', e => {
+  const b = e.target.closest('[data-kind]'); if(!b) return;
+  add.kind = b.dataset.kind;
+  $$('#fKind button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  refreshCool();
+});
+$('#fWant').addEventListener('click', e => {
+  const b = e.target.closest('[data-want]'); if(!b) return;
+  add.want = Number(b.dataset.want);
+  $$('#fWant button').forEach(x => x.classList.toggle('on', Number(x.dataset.want) <= add.want));
+  $('#fWantNote').textContent = WANT_WORDS[add.want];
+});
+$('#fSigns').addEventListener('change', e => {
+  const c = e.target.closest('[data-sign]'); if(!c) return;
+  const k = Number(c.dataset.sign);
+  add.signs = c.checked ? add.signs.concat(k) : add.signs.filter(x => x !== k);
+  /* 「疲れている／気分を変えたくて見ている」なら、気晴らしを先にすすめる */
+  $('#fRelief').hidden = !add.signs.includes(2);
+  refreshSigns(); refreshCool();
+});
+$('#fPrice').addEventListener('input', refreshCool);
+$('#fCool').addEventListener('change', () => { add.touchedCool = true; refreshCool(); });
+$('#formAdd').addEventListener('submit', submitAdd);
+
+/* あずけ中カードの操作 */
+$('#waitList').addEventListener('click', e => {
+  const btn = e.target.closest('[data-act]'); if(!btn) return;
+  const id = e.target.closest('[data-id]').dataset.id;
+  const i = db.items.find(x => x.id === id); if(!i) return;
+  if(btn.dataset.act === 'skip'){
+    decide(id, 'skipped');
+  }else if(btn.dataset.act === 'extend'){
+    snooze(id, 7);
+  }else if(btn.dataset.act === 'now'){
+    if(confirm(`あずける時間を待たずに「${i.name}」を買いますか？\n（待たずに買った記録として残ります）`)){
+      decide(id, 'bought', { impulse:true });
+    }
+  }
+});
+
+/* 決めるカードの操作 */
+$('#judgeList').addEventListener('click', e => {
+  const btn = e.target.closest('[data-act="judge"]'); if(!btn) return;
+  openJudge(e.target.closest('[data-id]').dataset.id);
+});
+
+/* 判定ダイアログの操作 */
+$('#jWant').addEventListener('click', e => {
+  const b = e.target.closest('[data-jwant]'); if(!b) return;
+  judgeWant = Number(b.dataset.jwant);
+  drawJudgeStars();
+});
+$('#jSkip').addEventListener('click', () => { decide(judgeId, 'skipped', { wantAfter: judgeWant }); $('#dlgJudge').close(); });
+$('#jBuy').addEventListener('click',  () => { decide(judgeId, 'bought',  { wantAfter: judgeWant }); $('#dlgJudge').close(); });
+$('#jSnooze').addEventListener('click',() => { snooze(judgeId, 7); $('#dlgJudge').close(); });
+
+/* 履歴の削除 */
+$('#logList').addEventListener('click', e => {
+  const btn = e.target.closest('[data-act="del"]'); if(!btn) return;
+  const id = e.target.closest('[data-id]').dataset.id;
+  const i = db.items.find(x => x.id === id); if(!i) return;
+  if(!confirm(`「${i.name}」の記録を消しますか？`)) return;
+  db.items = db.items.filter(x => x.id !== id);
+  save(); render(); toast('記録を消しました');
+});
+
+/* 設定の操作 */
+$('#sBudget').addEventListener('change', e => {
+  db.settings.budget = Math.max(0, Math.round(Number(e.target.value || 0)));
+  save(); render();
+});
+$('#sTheme').addEventListener('change', e => {
+  db.settings.theme = e.target.value;
+  save(); render();
+});
+$('#sRules').addEventListener('change', e => {
+  const s = e.target.closest('[data-rule]'); if(!s) return;
+  db.settings.rules[Number(s.dataset.rule)].hours = Number(s.value);
+  save();
+});
+$('#sNotify').addEventListener('click', async () => {
+  if(!('Notification' in window)) return;
+  const p = await Notification.requestPermission();
+  $('#sNotify').textContent = p === 'granted' ? '許可ずみ' : (p === 'denied' ? 'ブラウザで拒否中' : '許可する');
+  $('#sNotify').disabled = p !== 'default';
+});
+$('#sExport').addEventListener('click', exportJson);
+$('#sImport').addEventListener('click', () => $('#sFile').click());
+$('#sFile').addEventListener('change', e => { if(e.target.files[0]) importJson(e.target.files[0]); e.target.value = ''; });
+$('#sReset').addEventListener('click', () => {
+  if(!confirm('すべての記録を消します。元に戻せません。よろしいですか？')) return;
+  if(!confirm('本当に消してよろしいですか？')) return;
+  db = blank(); save(); render(); $('#dlgSet').close(); toast('すべて消しました');
+});
+
+/* ═══ 起動 ═══════════════════════════ */
+buildAddForm();
+render();
+checkReady();
+setInterval(checkReady, 30 * 1000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) checkReady(); });
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
