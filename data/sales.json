@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-09-20T09:01:07.916214+09:00",
+  "updatedAt": "2026-09-20T23:04:09.236418+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
+    {
+      "id": "auto-fedd5d5a78",
+      "airline": "Peach",
+      "type": "キャンペーン",
+      "title": "シルバーウイークに就航！成田空港から7年ぶりの国際線東京（成田）- ソウル（仁川）線の運航を開始",
+      "summary": "2019年以来7年ぶりとなる、成田空港発着の国際線就航！ 午前発、昼着の理想的なダイヤでソウル滞在を最大化 羽田空港発着路線との組み合わせも自由自在 韓国路線初となる温かい機内食サービスを導入 Peachは...",
+      "url": "https://prtimes.jp/main/html/rd/p/000000045.000081560.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-09-20T17:41:45+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
     {
       "id": "auto-e6c440916c",
       "airline": "Jetstar Japan",
