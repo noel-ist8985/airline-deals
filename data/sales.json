@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-10-09T10:55:18.299160+09:00",
+  "updatedAt": "2026-10-10T01:55:03.794943+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
+    {
+      "id": "auto-edeb603dea",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "「ぬい活」の進化系「じぶんぐるみが行く！J-AIR特別冒険ツアー」を実施",
+      "summary": "（共同リリース） 2026年10月9日 株式会社FUNDARD 株式会社ジェイエア [画像2: https://prtimes.jp/i/30684/1578/r...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001578.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-10-09T13:17:56+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
     {
       "id": "auto-9f2f949335",
       "airline": "JAL",
@@ -440,25 +459,6 @@
         "マイル"
       ],
       "source": "manual"
-    },
-    {
-      "id": "auto-c4857c067b",
-      "airline": "JAL",
-      "type": "イベント",
-      "title": "国内線「JAL ハッピードリームキャンペーン 2026」を実施",
-      "summary": "JALは、2026年7月17(金)日～9月30日(水)の対象期間中にJALグループ国内線に2回ご搭乗いただくことで、素敵な賞品が抽選で当たる「JAL ハッピードリームキャンペーン 2026」を実施します。 賞品...",
-      "url": "https://prtimes.jp/main/html/rd/p/000001527.000030684.html",
-      "priceFrom": null,
-      "currency": "JPY",
-      "routes": [],
-      "saleStart": "",
-      "saleEnd": "",
-      "travelPeriod": "",
-      "postedAt": "2026-07-08T10:50:02+09:00",
-      "tags": [
-        "自動取得"
-      ],
-      "source": "PR TIMES"
     },
     {
       "id": "ana-2026-tabiwari",
