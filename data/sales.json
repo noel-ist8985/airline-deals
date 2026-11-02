@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-11-02T10:24:34.601622+09:00",
+  "updatedAt": "2026-11-03T05:09:48.666174+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
+    {
+      "id": "auto-416a66ff50",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "JALグループ 2027年3月期 第2四半期連結業績",
+      "summary": "JALグループは、本日2027年3月期第2四半期連結業績(2026年4月1日～2026年9月30日)について取りまとめました。 ● 売上収益は、航空事業、マイル/金融・コマース事業において前年を上回り、 1兆98...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001590.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-11-02T13:22:25+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
     {
       "id": "auto-749f227adc",
       "airline": "JAL",
@@ -206,25 +225,6 @@
       "saleEnd": "",
       "travelPeriod": "",
       "postedAt": "2026-08-18T15:00:02+09:00",
-      "tags": [
-        "自動取得"
-      ],
-      "source": "PR TIMES"
-    },
-    {
-      "id": "auto-febb32ac57",
-      "airline": "JAL",
-      "type": "キャンペーン",
-      "title": "JAL、マレーシア航空とともに日本＝マレーシア間の人流創出・インバウンド地方送客に貢献",
-      "summary": "・9月2日よりマレーシア航空が開設する福岡＝クアラルンプール線において、JALは8月7日からコードシェア販売を開始します。 ・マレーシア航空とのコードシェア路線拡大を記念し、ダブルマイルキャ...",
-      "url": "https://prtimes.jp/main/html/rd/p/000001543.000030684.html",
-      "priceFrom": null,
-      "currency": "JPY",
-      "routes": [],
-      "saleStart": "",
-      "saleEnd": "",
-      "travelPeriod": "",
-      "postedAt": "2026-08-07T15:00:01+09:00",
       "tags": [
         "自動取得"
       ],
