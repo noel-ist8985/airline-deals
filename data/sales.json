@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-11-06T11:08:49.935220+09:00",
+  "updatedAt": "2026-11-07T02:19:53.672671+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
+    {
+      "id": "auto-9544de7b71",
+      "airline": "JAL",
+      "type": "キャンペーン",
+      "title": "GREEN×EXPO 2027の特別塗装機「JAL トゥンクトゥンクJET」が就航",
+      "summary": "JALは、2027年3月19日(金)より神奈川県横浜市にて開催される「2027年国際園芸博覧会(以下、GREEN×EX...",
+      "url": "https://prtimes.jp/main/html/rd/p/000001591.000030684.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-11-06T17:21:32+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
     {
       "id": "auto-416a66ff50",
       "airline": "JAL",
@@ -206,25 +225,6 @@
       "saleEnd": "",
       "travelPeriod": "",
       "postedAt": "2026-08-20T14:00:02+09:00",
-      "tags": [
-        "自動取得"
-      ],
-      "source": "PR TIMES"
-    },
-    {
-      "id": "auto-475bcce259",
-      "airline": "JAL",
-      "type": "キャンペーン",
-      "title": "2026年度 下期のJALグループ路線便数計画を一部変更",
-      "summary": "● 国際線では欧州直行便を強化します。羽田=ヘルシンキ線を毎日運航へ増便するなど、欧州直 行便の提供座席数を前年から16%拡大するとともに、高い商品性でご好評をいただいて...",
-      "url": "https://prtimes.jp/main/html/rd/p/000001545.000030684.html",
-      "priceFrom": null,
-      "currency": "JPY",
-      "routes": [],
-      "saleStart": "",
-      "saleEnd": "",
-      "travelPeriod": "",
-      "postedAt": "2026-08-18T15:00:02+09:00",
       "tags": [
         "自動取得"
       ],
