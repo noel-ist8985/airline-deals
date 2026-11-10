@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-10T13:00:56.058037+09:00",
+  "updatedAt": "2026-11-11T02:37:36.907529+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
     {
@@ -571,25 +571,6 @@
         "地方路線"
       ],
       "source": "manual"
-    },
-    {
-      "id": "auto-ab60849128",
-      "airline": "Peach",
-      "type": "キャンペーン",
-      "title": "東京（成田）- ソウル（仁川）線を開設！7 年ぶりの成田空港発着 国際線就航",
-      "summary": "Peach Aviation 株式会社（以下: Peach、代表取締役 CEO: 大橋 一成）は、9 月 20 日（日）から 東京（成田）- ソウル（仁川）線を開設することを発表しました。本日 16:00 より、航空券の…",
-      "url": "https://prtimes.jp/main/html/rd/p/000000040.000081560.html",
-      "priceFrom": null,
-      "currency": "JPY",
-      "routes": [],
-      "saleStart": "",
-      "saleEnd": "",
-      "travelPeriod": "",
-      "postedAt": "2026-05-14T16:00:02+09:00",
-      "tags": [
-        "自動取得"
-      ],
-      "source": "PR TIMES"
     }
   ]
 }
