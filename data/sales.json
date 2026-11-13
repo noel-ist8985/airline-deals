@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-11-13T03:04:02.204092+09:00",
+  "updatedAt": "2026-11-13T11:29:36.031350+09:00",
   "note": "PR TIMES 等から自動取得した情報と、手動分(data/manual.json)を統合しています。価格・締切などが空の項目は自動取得分です。詳細は各公式ページでご確認ください。",
   "sales": [
+    {
+      "id": "auto-4f5ec65981",
+      "airline": "Jetstar Japan",
+      "type": "セール",
+      "title": "日本国内線・日本発着国際線 全路線対象 “96（クロ）”が隠れた運賃で「ブラックフライデー」開催",
+      "summary": "ジェットスター・ジャパン株式会社、ジェットスター航空のジェットスターグループ2社は、2026年11月20日（金）より、日本国内線・日本発着国際線の全路線を対象とした「ブラックフライデー」を開催いたします。 [...",
+      "url": "https://prtimes.jp/main/html/rd/p/000000222.000012437.html",
+      "priceFrom": null,
+      "currency": "JPY",
+      "routes": [],
+      "saleStart": "",
+      "saleEnd": "",
+      "travelPeriod": "",
+      "postedAt": "2026-11-13T11:00:02+09:00",
+      "tags": [
+        "自動取得"
+      ],
+      "source": "PR TIMES"
+    },
     {
       "id": "auto-9544de7b71",
       "airline": "JAL",
