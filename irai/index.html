@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="思いついたままのメモから、Skebなどでイラストを依頼するときの丁寧な依頼文をつくるアプリ。">
+<title>依頼文メーカー</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%231e5e71'/%3E%3Cpath d='M18 20h28a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4H30l-8 7v-7h-4a4 4 0 0 1-4-4V24a4 4 0 0 1 4-4z' fill='%23fff'/%3E%3Cpath d='M23 29h18M23 35h11' stroke='%231e5e71' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#e6ecf0; --card:#ffffff; --card-2:#f5f8fa; --field:#ffffff;
+    --title:#363636; --ink:#4a4a4a; --muted:#7a8892; --line:#dbe3e9; --line-soft:#edf1f4;
+    --link:#1e5e71; --link-soft:#e2eff2; --link-hover:#16495a;
+    --dark:#242e36; --dark-fg:#ffffff;
+    --ok:#257953; --ok-bg:#e6f5ee; --warn:#946c00; --warn-bg:#fff6dc; --info:#1e5e71; --info-bg:#e2eff2;
+
+    --c-chara:#2f6fb0;  --b-chara:#e5eef8;
+    --c-outfit:#b23a7a; --b-outfit:#fae6f0;
+    --c-pose:#bb5a1e;   --b-pose:#fcebdd;
+    --c-comp:#6845b8;   --b-comp:#ece6f9;
+    --c-bg:#2c7c55;     --b-bg:#e3f3ea;
+    --c-mood:#9a6a10;   --b-mood:#fbf0d6;
+    --c-use:#1e5e71;    --b-use:#e2eff2;
+    --c-ng:#c0392b;     --b-ng:#fce6e3;
+    --c-ref:#55626c;    --b-ref:#eaeef1;
+    --c-other:#6a6f78;  --b-other:#eff1f3;
+
+    --font:"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14191d; --card:#1e252b; --card-2:#252d34; --field:#192025;
+      --title:#eef2f5; --ink:#d3dbe1; --muted:#8d9aa4; --line:#35414a; --line-soft:#2a333a;
+      --link:#7cc3d6; --link-soft:#1b3640; --link-hover:#a6dbe9;
+      --dark:#e3e9ee; --dark-fg:#1b2329;
+      --ok:#6ccf9e; --ok-bg:#183428; --warn:#e9c15a; --warn-bg:#382f14; --info:#7cc3d6; --info-bg:#1b3640;
+      --c-chara:#86b6ec; --b-chara:#1c2c3f;
+      --c-outfit:#ef93c4; --b-outfit:#3a1e2f;
+      --c-pose:#f2a670;  --b-pose:#3b2718;
+      --c-comp:#b6a0f0;  --b-comp:#2b2442;
+      --c-bg:#76d0a0;    --b-bg:#183326;
+      --c-mood:#e6c467;  --b-mood:#372e14;
+      --c-use:#7cc3d6;   --b-use:#1b3640;
+      --c-ng:#f39a8f;    --b-ng:#3c1d1a;
+      --c-ref:#b6c1c9;   --b-ref:#2b3238;
+      --c-other:#bdc2ca; --b-other:#2b3036;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14191d; --card:#1e252b; --card-2:#252d34; --field:#192025;
+    --title:#eef2f5; --ink:#d3dbe1; --muted:#8d9aa4; --line:#35414a; --line-soft:#2a333a;
+    --link:#7cc3d6; --link-soft:#1b3640; --dark:#e3e9ee; --dark-fg:#1b2329;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:70px}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.75}
+  a{color:var(--link);text-decoration:none}
+  a:hover{color:var(--link-hover);text-decoration:underline}
+
+  /* ── 上のバー ── */
+  .navbar{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line)}
+  .navbar .in{max-width:1180px;margin:0 auto;height:58px;padding:0 16px;display:flex;align-items:center;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;color:var(--title);font-weight:900;font-size:19px;letter-spacing:.02em}
+  .brand:hover{text-decoration:none;color:var(--title)}
+  .brand svg{width:36px;height:36px;flex:none}
+  .brand,.badge{white-space:nowrap}
+  @media (max-width:979px){.navbar #copy{display:none}}
+  .badge{font-size:12px;font-weight:700;color:var(--link);background:var(--link-soft);border-radius:4px;padding:1px 7px;letter-spacing:0}
+  .navbar .sp{flex:1}
+  .btn-dark{font:inherit;font-weight:700;font-size:15px;background:var(--dark);color:var(--dark-fg);border:0;border-radius:4px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .btn-dark:hover{filter:brightness(1.15)}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 110px}
+
+  /* ── 白いカード ── */
+  .card{background:var(--card);border-radius:4px;padding:22px 20px 24px;margin-bottom:20px}
+  @media (min-width:600px){.card{padding:26px 30px 30px}}
+  .card-title{display:flex;align-items:center;gap:8px;margin:0 0 6px;color:var(--title);font-size:21px;font-weight:700}
+  .card-title .tri{color:var(--title);font-size:14px}
+  .num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--link);color:#fff;font-size:15px;font-weight:900;flex:none}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .num{color:#10242b}}
+  .lead{margin:0 0 14px;color:var(--muted);font-size:15px}
+  hr.sep{border:0;border-top:1px solid var(--line);margin:18px 0}
+
+  /* お知らせ風の使い方 */
+  .news ul{margin:0;padding-left:1.3em}
+  .news li{margin:4px 0;font-size:16.5px}
+  .news li::marker{color:var(--title)}
+  .news .d{color:var(--muted);font-size:14px;margin-right:4px}
+  .news b{color:var(--link)}
+
+  /* 中点区切りのメニュー */
+  .tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 0;font-size:16px;padding:4px 0 0}
+  .tabs a{padding:2px 4px}
+  .tabs a + a::before{content:"•";color:var(--muted);margin:0 12px 0 8px;display:inline-block}
+
+  /* ── 入力 ── */
+  .grid{display:grid;grid-template-columns:1fr;gap:0 20px}
+  @media (min-width:980px){
+    .grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:start}
+    .sticky{position:sticky;top:78px}
+  }
+  label.f{display:block;color:var(--title);font-weight:700;margin:16px 0 6px;font-size:16px}
+  label.f small{font-weight:400;color:var(--muted);font-size:13.5px;margin-left:6px}
+  input[type=text],textarea{width:100%;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:4px;padding:10px 12px;box-shadow:inset 0 1px 2px rgba(10,10,10,.05)}
+  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--link);box-shadow:0 0 0 3px var(--link-soft)}
+  input::placeholder,textarea::placeholder{color:#a3afb7}
+  textarea{resize:vertical}
+  #src{min-height:240px}
+  .row2{display:grid;grid-template-columns:1fr;gap:0 16px}
+  @media (min-width:560px){.row2{grid-template-columns:1fr 1fr}}
+
+  .btn{font:inherit;font-size:15px;font-weight:700;border-radius:4px;padding:8px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.4;text-align:left}
+  .btn small{font-weight:400;font-size:12.5px;color:var(--muted)}
+  .btn:hover{border-color:var(--link);color:var(--link)}
+  .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+
+  .choices{display:flex;flex-wrap:wrap;gap:8px}
+  .choice{position:relative}
+  .choice input{position:absolute;opacity:0;pointer-events:none}
+  .choice span{display:block;border:1px solid var(--line);background:var(--card);border-radius:4px;padding:8px 13px;cursor:pointer;font-weight:700;font-size:15.5px;line-height:1.4;color:var(--ink)}
+  .choice span small{display:block;font-weight:400;font-size:12.5px;color:var(--muted)}
+  .choice span:hover{border-color:var(--link)}
+  .choice input:checked + span{border-color:var(--link);background:var(--link-soft);color:var(--link);box-shadow:inset 0 0 0 1px var(--link)}
+  .choice input:checked + span small{color:var(--link)}
+  .choice input:focus-visible + span{outline:3px solid var(--link);outline-offset:2px}
+
+  /* ── 仕分け結果 ── */
+  .legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .tag{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;border-radius:4px;padding:1px 8px;background:var(--b);color:var(--c)}
+  .items{display:flex;flex-direction:column;gap:8px}
+  .item{border:1px solid var(--line);border-left:5px solid var(--c);background:var(--card);border-radius:4px;padding:8px 12px 10px}
+  .item .head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:2px}
+  .item select{font:inherit;font-size:13.5px;font-weight:700;color:var(--c);background:var(--b);border:0;border-radius:4px;padding:3px 8px;cursor:pointer}
+  .item .orig{font-size:13.5px;color:var(--muted);word-break:break-all}
+  .item .conv{font-size:16px;color:var(--title);word-break:break-all}
+  .item .moved{font-size:12px;color:var(--muted)}
+  .empty{color:var(--muted);font-size:15px;padding:18px;border:1px dashed var(--line);border-radius:4px;text-align:center}
+
+  /* ── 依頼文プレビュー ── */
+  .to{display:flex;align-items:center;gap:12px;padding:4px 0 14px;border-bottom:1px solid var(--line);margin-bottom:14px}
+  .avatar{width:52px;height:52px;border-radius:50%;background:var(--link-soft);color:var(--link);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;flex:none;border:2px solid var(--card);box-shadow:0 0 0 1px var(--line)}
+  .to .who{line-height:1.4}
+  .to .who b{display:block;color:var(--title);font-size:18px}
+  .to .who span{color:var(--muted);font-size:13.5px}
+  .to .site{margin-left:auto;font-size:12.5px;font-weight:700;border:1px solid var(--line);border-radius:4px;padding:2px 8px;color:var(--muted);white-space:nowrap}
+  .reqlabel{display:flex;justify-content:space-between;align-items:baseline;color:var(--title);font-weight:700;font-size:16px;margin-bottom:6px}
+  .count{font-weight:500;font-size:14px;color:var(--muted)}
+  #out{min-height:440px;font-size:16px;line-height:1.85;background:var(--field)}
+  .notice{display:none;background:var(--warn-bg);color:var(--warn);border-radius:4px;padding:8px 12px;font-size:14.5px;font-weight:700;margin-bottom:10px}
+  .notice.show{display:block}
+  .bigcopy{width:100%;justify-content:center;font-size:17px;padding:13px 16px;margin-top:12px}
+  .subrow{display:flex;justify-content:center;margin-top:10px}
+  .linkbtn{font:inherit;font-size:14.5px;background:none;border:0;color:var(--link);cursor:pointer;padding:4px 8px}
+  .linkbtn:hover{text-decoration:underline}
+
+  .checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .checks li{border-radius:4px;padding:9px 12px;font-size:15px;display:flex;gap:8px;align-items:flex-start;line-height:1.55}
+  .checks li.ok{background:var(--ok-bg);color:var(--ok)}
+  .checks li.warn{background:var(--warn-bg);color:var(--warn)}
+  .checks li.info{background:var(--info-bg);color:var(--info)}
+  .checks li b{display:block}
+  .checks li span.t{color:var(--ink);font-size:14px}
+  .tips{margin:0;padding-left:1.3em;font-size:15.5px}
+  .tips li{margin:6px 0}
+  .tips b{color:var(--title)}
+
+  footer{background:var(--card);border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:22px 16px 110px}
+  @media (min-width:980px){footer{padding-bottom:26px}}
+
+  /* スマホ用：下に固定のバー */
+  .bottombar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px}
+  .bottombar .btn-dark,.bottombar .btn{flex:1;justify-content:center;align-items:center;font-size:15.5px;padding:11px 10px}
+  @media (min-width:980px){.bottombar{display:none}}
+
+  .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:var(--dark);color:var(--dark-fg);padding:10px 20px;border-radius:4px;font-weight:700;opacity:0;transition:.25s;pointer-events:none;z-index:30}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="in">
+    <a class="brand" href="#top" aria-label="依頼文メーカー">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#1e5e71"/><path d="M18 20h28a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4H30l-8 7v-7h-4a4 4 0 0 1-4-4V24a4 4 0 0 1 4-4z" fill="#fff"/><path d="M23 29h18M23 35h11" stroke="#1e5e71" stroke-width="3" stroke-linecap="round"/></svg>
+      依頼文メーカー
+    </a>
+    <span class="badge">Skeb向け</span>
+    <span class="sp"></span>
+    <button class="btn-dark" id="copy" type="button">📋 コピー</button>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
+  <section class="card news">
+    <ul>
+      <li><span class="d">[STEP 1]</span> <b>①</b>に、描いてほしい内容を<b>メモ書きのまま</b>入力します（話し言葉・箇条書きでOK）</li>
+      <li><span class="d">[STEP 2]</span> <b>②③</b>で、描き手さんの名前や使いみちを選びます（わからない所は空欄でOK）</li>
+      <li><span class="d">[STEP 3]</span> <b>依頼文が自動でできあがる</b>ので、確認して「コピー」→ Skebなどに貼りつけます</li>
+    </ul>
+    <hr class="sep">
+    <div class="tabs">
+      <a href="#s-src">元の文章</a><a href="#s-who">相手とキャラ</a><a href="#s-use">使いみち</a><a href="#s-out">依頼文</a><a href="#s-check">チェック</a>
+    </div>
+  </section>
+
+  <div class="grid">
+    <!-- ===== 左：入力 ===== -->
+    <div>
+      <section class="card" id="s-src">
+        <h2 class="card-title"><span class="num">1</span>元になる文章</h2>
+        <p class="lead">描いてほしいことを、思いついた順にどんどん書いてください。改行や「。」で区切ると、きれいに仕分けされます。</p>
+        <textarea id="src" placeholder="例）&#10;うちの子のルルを描いてほしい！&#10;いつもの制服で、笑顔でピースしてるのがいい&#10;背景は桜で、ふんわりした雰囲気&#10;Xのアイコンに使いたい&#10;武器は持たせないで"></textarea>
+        <div class="btns">
+          <button class="btn" id="sample" type="button">📝 例文を入れてみる<small>どんな感じになるか試せます</small></button>
+          <button class="btn" id="clear" type="button">🗑 ぜんぶ消す<small>入力をすべて空にします</small></button>
+        </div>
+      </section>
+
+      <section class="card" id="s-who">
+        <h2 class="card-title"><span class="num">2</span>相手とキャラクター</h2>
+        <p class="lead">あいさつ文と最初の一文に使います。空欄でも依頼文はつくれます。</p>
+        <label class="f">依頼するサイト</label>
+        <div class="choices" id="site">
+          <label class="choice"><input type="radio" name="site" value="skeb" checked><span>Skeb<small>やりとりなしの一発依頼</small></span></label>
+          <label class="choice"><input type="radio" name="site" value="market"><span>SKIMA・ココナラなど<small>相談しながら進める</small></span></label>
+          <label class="choice"><input type="radio" name="site" value="dm"><span>X(Twitter)のDM・メール<small>受けてもらえるか聞く</small></span></label>
+        </div>
+        <div class="row2">
+          <div><label class="f" for="creator">描き手さんのお名前<small>「様」は自動でつきます</small></label><input type="text" id="creator" placeholder="例）みどり"></div>
+          <div><label class="f" for="me">あなたの名前<small>空欄でもOK</small></label><input type="text" id="me" placeholder="例）ゆき"></div>
+          <div><label class="f" for="chara">描いてほしいキャラの名前</label><input type="text" id="chara" placeholder="例）ルル"></div>
+          <div><label class="f" for="work">作品名<small>オリジナルなら空欄</small></label><input type="text" id="work" placeholder="例）〇〇物語"></div>
+        </div>
+        <label class="f" for="like">相手の絵の好きなところ<small>書くと気持ちが伝わります</small></label>
+        <input type="text" id="like" placeholder="例）やわらかい色づかい">
+        <label class="f" for="refs">参考画像のURL<small>1行に1つ・キャラの見た目がわかる画像など</small></label>
+        <textarea id="refs" rows="2" placeholder="https://..."></textarea>
+      </section>
+
+      <section class="card" id="s-use">
+        <h2 class="card-title"><span class="num">3</span>使いみちと書き方</h2>
+        <label class="f">完成した絵の使いみち<small>あてはまるものを全部</small></label>
+        <div class="choices" id="uses">
+          <label class="choice"><input type="checkbox" value="personal"><span>🏠 個人で楽しむ</span></label>
+          <label class="choice"><input type="checkbox" value="icon"><span>🙂 SNSのアイコン</span></label>
+          <label class="choice"><input type="checkbox" value="header"><span>🖼 SNSのヘッダー</span></label>
+          <label class="choice"><input type="checkbox" value="post"><span>📣 SNSで紹介</span></label>
+          <label class="choice"><input type="checkbox" value="wall"><span>📱 スマホの壁紙</span></label>
+          <label class="choice"><input type="checkbox" value="stream"><span>🎥 配信・動画</span></label>
+          <label class="choice"><input type="checkbox" value="credit"><span>✍️ 名前を記載します<small>使うとき描き手さんの名前を書く</small></span></label>
+        </div>
+
+        <label class="f">おまかせ度</label>
+        <div class="choices" id="freedom">
+          <label class="choice"><input type="radio" name="freedom" value="lots"><span>🌈 たくさんおまかせ<small>自由にアレンジOK</small></span></label>
+          <label class="choice"><input type="radio" name="freedom" value="mid" checked><span>🙂 ほどほど<small>書いてない所はおまかせ</small></span></label>
+          <label class="choice"><input type="radio" name="freedom" value="strict"><span>📐 しっかり指定<small>なるべく内容どおりに</small></span></label>
+        </div>
+
+        <label class="f">文章の丁寧さ</label>
+        <div class="choices" id="tone">
+          <label class="choice"><input type="radio" name="tone" value="very"><span>🎩 とても丁寧<small>〜いただけますと幸いです</small></span></label>
+          <label class="choice"><input type="radio" name="tone" value="polite" checked><span>🙇 丁寧<small>〜いただけますと嬉しいです</small></span></label>
+          <label class="choice"><input type="radio" name="tone" value="soft"><span>☺️ やわらかめ<small>〜もらえると嬉しいです</small></span></label>
+        </div>
+      </section>
+
+      <section class="card" id="s-sort">
+        <h2 class="card-title"><span class="tri">▼</span>仕分けの結果</h2>
+        <p class="lead">①の文章を、内容ごとに自動で分けました。<b>分け方がちがう時は、色つきの欄を押して選び直せます。</b></p>
+        <div class="legend" id="legend"></div>
+        <div class="items" id="items"></div>
+      </section>
+    </div>
+
+    <!-- ===== 右：依頼文 ===== -->
+    <div class="sticky">
+      <section class="card" id="s-out">
+        <h2 class="card-title"><span class="tri">▼</span>できあがった依頼文</h2>
+        <p class="lead">左を書きかえると自動で作り直されます。ここで直接手直しもできます。</p>
+        <div class="to">
+          <div class="avatar" id="pvAvatar">？</div>
+          <div class="who"><b id="pvName">描き手さん</b><span>へのリクエスト</span></div>
+          <span class="site" id="pvSite">Skeb</span>
+        </div>
+        <div class="notice" id="notice">✏️ 手で直した内容があります。左を変えても上書きされません（「作り直す」で最新の内容に戻ります）</div>
+        <div class="reqlabel"><span>リクエスト本文</span><span class="count" id="count">0文字</span></div>
+        <textarea id="out" spellcheck="false"></textarea>
+        <button class="btn-dark bigcopy" id="copy2" type="button">📋 依頼文をコピーする</button>
+        <div class="subrow"><button class="linkbtn" id="regen" type="button">🔄 手直しを捨てて作り直す</button></div>
+      </section>
+
+      <section class="card" id="s-check">
+        <h2 class="card-title"><span class="tri">▼</span>送る前のチェック</h2>
+        <ul class="checks" id="checks"></ul>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title"><span class="tri">▼</span>依頼のコツ</h2>
+        <ul class="tips" id="tips"></ul>
+      </section>
+    </div>
+  </div>
+</div>
+
+<footer>
+  依頼文メーカーは個人でつくった非公式ツールで、Skeb・SKIMA・ココナラとは関係ありません。<br>
+  入力した内容はこのブラウザの中だけに保存されます（外には送信されません）
+</footer>
+
+<div class="bottombar">
+  <a class="btn" href="#s-out" id="barView">✨ 依頼文を見る</a>
+  <button class="btn-dark" id="barCopy" type="button">📋 コピー</button>
+</div>
+<div class="toast" id="toast">コピーしました</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ---------- 項目の種類 ---------- */
+const CATS = [
+  {id:'chara',  label:'キャラクター',  emoji:'👤', w:1, kw:['キャラ','ちゃん','くん','君','さん','推し','うちの子','オリキャラ','オリジナル','女の子','男の子','少女','少年','女性','男性','髪','ヘア','ツインテ','ポニテ','ショート','ロング','瞳','目の色','目は','肌','身長','年齢','歳','性格','けもみみ','ケモ耳','しっぽ','尻尾','角','翼','羽','人外','獣']},
+  {id:'outfit', label:'服装・見た目',  emoji:'👗', w:1, kw:['服','衣装','制服','私服','セーラー','ブレザー','学ラン','スーツ','水着','ドレス','着物','和服','浴衣','パーカー','シャツ','スカート','ズボン','パンツ','ワンピース','コート','ジャケット','帽子','眼鏡','メガネ','めがね','アクセ','リボン','靴','ニーハイ','タイツ','パジャマ','メイド','コスプレ','着て','着せ','コーデ','姿']},
+  {id:'pose',   label:'ポーズ・表情',  emoji:'😊', w:1, kw:['ポーズ','笑顔','笑って','笑う','微笑','にっこり','泣','涙','怒','照れ','赤面','ピース','ウインク','ウィンク','表情','顔は','座','立ち','寝','手を','抱','見上げ','振り向','ジャンプ','走','食べ','飲','持って','持た','持つ','指差','ハート','目線','ドヤ','困り','真顔','キメ','決め','おねだり','手振']},
+  {id:'comp',   label:'構図・サイズ',  emoji:'🖼', w:1, kw:['全身','上半身','半身','バストアップ','アップ','構図','横長','縦長','正方形','サイズ','アングル','俯瞰','あおり','煽り','二人','2人','２人','ふたり','ツーショット','複数','引き','寄り','画角','px','比率','16:9','1:1','差分','カメラ']},
+  {id:'bg',     label:'背景・小物',    emoji:'🌸', w:1, kw:['背景','桜','海','空','夜','星','月','部屋','教室','街','花','雪','雨','夕焼','夕日','森','カフェ','小物','アイテム','透過','白背景','単色','風景','ぬいぐるみ','お菓子','食べ物','猫','犬','動物','ケーキ']},
+  {id:'mood',   label:'雰囲気・色',    emoji:'🎨', w:1, kw:['雰囲気','色','カラー','明る','暗','かわいい','可愛','かっこいい','カッコいい','格好良','エモ','ふんわり','優し','やさし','塗り','タッチ','淡','パステル','ポップ','ダーク','爽やか','さわやか','綺麗','きれい','美し','儚','元気','クール','ゆるい','水彩','シック','レトロ','季節','クリスマス','ハロウィン','バレンタイン','お正月']},
+  {id:'use',    label:'使いみち',      emoji:'📱', w:2, kw:['アイコン','ヘッダー','壁紙','待ち受け','待受','用途','使いたい','使わせ','使用','投稿','SNS','Twitter','ツイッター','配信','動画','サムネ','印刷','グッズ','プロフィール','ロック画面','プレゼント','飾り']},
+  {id:'ng',     label:'NG・避けてほしいこと', emoji:'🚫', w:3, kw:['NG','ＮＧ','しないで','ないで','避け','控えめ','苦手','いらない','要らない','不要','ダメ','だめ','やめて','禁止','なしで','無しで','嫌']},
+  {id:'ref',    label:'参考資料',      emoji:'🔗', w:3, kw:['参考','資料','URL','http','リンク','pixiv','公式','設定画','立ち絵']},
+  {id:'other',  label:'その他のご希望', emoji:'💬', w:0, kw:[]},
+];
+const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
+const catStyle = id => `--c:var(--c-${id});--b:var(--b-${id})`;
+
+/* ---------- 例文 ---------- */
+const SAMPLE = {
+  src:`うちの子（オリジナルキャラ）のルルを描いてほしい！
+髪はピンクのロングで、ゆるく巻いてる感じ
+いつもの制服で、笑顔でピースしてるのがいい
+上半身くらいの構図
+背景は桜で、春っぽくふんわりした雰囲気
+Xのアイコンに使いたい
+露出は控えめでお願いしたいです。武器は持たせないで`,
+  creator:'みどり', me:'ゆき', chara:'ルル', work:'', like:'やわらかい色づかいと、表情の描き方', refs:'',
+  uses:['icon','credit'], freedom:'mid', tone:'polite', site:'skeb'
+};
+
+/* ---------- 仕分け ---------- */
+function classify(text){
+  let best = 'other', bestScore = 0;
+  CATS.forEach(c => {
+    if (!c.w) return;
+    let hits = 0;
+    c.kw.forEach(k => { if (text.includes(k)) hits++; });
+    let score = hits * c.w;
+    if (c.id === 'ref' && /⟦\d+⟧/.test(text)) score += 5;
+    if (score > bestScore) { best = c.id; bestScore = score; }
+  });
+  return {cat: best, score: bestScore};
+}
+
+const JOIN_END = /(を|が|は|の|と|も|や|へ|に|から|より|って|けど|けれど|ので|たら|れば|ても|でも)$/;
+
+function parse(src){
+  const urls = [];
+  const t = src.replace(/https?:\/\/[^\s　、。「」（）()<>]+/g, m => { urls.push(m); return `⟦${urls.length - 1}⟧`; });
+  const restore = s => s.replace(/⟦(\d+)⟧/g, (_, i) => urls[+i]);
+  const out = [];
+  for (let s of t.split(/[\n。！!？?]+/)) {
+    s = s.replace(/^[\s　]*([・\-－‐―●○◆◇■□*＊※✓✔→>＞]+|[\d０-９]+[\.．)）])?[\s　]*/, '').trim();
+    if (!s) continue;
+    const chunks = s.split(/[、，,]/).map(x => x.trim()).filter(Boolean);
+    const merged = [];
+    let buf = '';
+    chunks.forEach((c, i) => {
+      buf = buf ? buf + '、' + c : c;
+      if (i < chunks.length - 1 && JOIN_END.test(buf)) return;
+      merged.push(buf); buf = '';
+    });
+    if (buf) merged.push(buf);
+    const groups = [];
+    merged.forEach(c => {
+      const r = classify(c);
+      const last = groups[groups.length - 1];
+      if (last && (r.score === 0 || last.cat === r.cat)) last.text += '、' + c;
+      else groups.push({text: c, cat: r.cat, score: r.score});
+    });
+    if (groups.length > 1 && groups[0].score === 0) {
+      groups[1].text = groups[0].text + '、' + groups[1].text;
+      groups.shift();
+    }
+    groups.forEach(g => out.push({text: restore(g.text), cat: g.cat}));
+  }
+  return out;
+}
+
+/* ---------- 話し言葉 → 丁寧な文 ---------- */
+const WORDS = [
+  [/めちゃくちゃ|めっちゃ|めちゃ|すっごく|すっごい|すごく/g, 'とても'],
+  [/超(?=[ぁ-ん])/g, 'とても'],
+  [/ちょっと/g, '少し'],
+  [/あんまり/g, 'あまり'],
+  [/じゃなくて/g, 'ではなく'],
+  [/じゃない/g, 'ではない'],
+  [/やつ/g, 'もの'],
+  [/けど(?=.)/g, 'けれど'],
+];
+const END_RULES = [
+  [/(です|ます|ください|下さい|ません|でした|ました|でしょうか|ませんか|幸いです|嬉しいです)$/, null],
+  [/(お任せ|おまかせ)(で|します|でお願い)?$/, 'お任せいたします'],
+  [/お願い$/, 'お願いします'],
+  [/よろしく$/, 'よろしくお願いします'],
+  [/(いらない|要らない|いらん|不要)$/, 'なしで大丈夫です'],
+  [/(NG|ＮＧ|ng|なし|無し|ナシ)$/, '$1でお願いします'],
+  [/ないで(ほしい|欲しい)?$/, 'ないでいただけますと嬉しいです'],
+  [/([てで])(ほしい|欲しい)$/, '$1いただけますと嬉しいです'],
+  [/(が|を)?(ほしい|欲しい)$/, 'があると嬉しいです'],
+  [/たい(んだ|んです)?$/, 'たいです'],
+  [/(だよね|だよ|だね|だな|だ|である)$/, 'です'],
+  [/([一-龠々ァ-ヶー])が(いい|良い)$/, '$1だと嬉しいです'],
+  [/が(いい|良い)$/, 'がいいです'],
+  [/(いい|良い)$/, '$1です'],
+  [/んで$/, 'んでいただけますと嬉しいです'],
+  [/いで$/, 'いでいただけますと嬉しいです'],
+  [/て$/, 'ていただけますと嬉しいです'],
+  [/で$/, 'でお願いします'],
+  [/に$/, 'にしていただけますと嬉しいです'],
+  [/([ぁ-ん])く$/, '$1くしていただけますと嬉しいです'],
+  [/(ない|い)$/, '$1と嬉しいです'],
+  [/[うくすつぬふむゆるぐずづぶぷた]$/, '$&感じだと嬉しいです'],
+];
+
+function polite(src){
+  let t = src.trim();
+  if (/https?:\/\/\S+$/.test(t)) return t;               // URLで終わる行はそのまま
+  let prev;
+  do {
+    prev = t;
+    t = t.replace(/[\s　]+$/, '')
+         .replace(/(（笑）|\(笑\)|(?<=[^\x00-\x7F])[wｗＷ]+|笑|[!！?？~〜～ー…・。、♪☆★♡♥]+)$/u, '')
+         .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]+$/u, '')
+         .replace(/([いだすたるうくなでてし])(よね|よ|ね|なぁ|なー|かな|かも|わ)$/, '$1')
+         .replace(/([いだ])な$/, '$1');
+  } while (t !== prev);
+  if (!t) return '';
+  t = t.replace(/([しっいえけせめれ])てる/g, '$1ている').replace(/んでる/g, 'んでいる');
+  t = t.replace(/(ている)(もの|やつ|の|感じ|ところ|とこ)が(いい|良い)$/, '$1姿だと嬉しいです');
+  WORDS.forEach(([re, rep]) => { t = t.replace(re, rep); });
+  for (const [re, rep] of END_RULES) {
+    if (re.test(t)) { return rep === null ? t : t.replace(re, rep); }
+  }
+  return t + 'でお願いします';
+}
+
+function applyTone(text, tone){
+  if (tone === 'very') return text.replace(/嬉しいです/g, '幸いです').replace(/お願いします/g, 'お願いいたします');
+  if (tone === 'soft') return text.replace(/いただけますと/g, 'もらえると').replace(/いたします/g, 'します').replace(/幸いです/g, '嬉しいです').replace(/恐縮ですが/g, '恐れ入りますが').replace(/おります/g, 'います');
+  return text;
+}
+const endDot = s => /[。！!？?）)」』]$|https?:\/\/\S+$/.test(s) ? s : s + '。';
+
+/* ---------- 入力の読み取り ---------- */
+function readForm(){
+  return {
+    src: $('#src').value,
+    creator: $('#creator').value.trim().replace(/(様|さま|さん)$/, ''),
+    me: $('#me').value.trim(),
+    chara: $('#chara').value.trim(),
+    work: $('#work').value.trim().replace(/^[『「]|[』」]$/g, ''),
+    like: $('#like').value.trim().replace(/[。.]$/, ''),
+    refs: $('#refs').value,
+    uses: $$('#uses input:checked').map(i => i.value),
+    freedom: ($('#freedom input:checked') || {}).value || 'mid',
+    tone: ($('#tone input:checked') || {}).value || 'polite',
+    site: ($('#site input:checked') || {}).value || 'skeb',
+  };
+}
+
+let overrides = {};   // 元の文 → 選び直した項目
+let phrases = [];
+let edited = false;
+
+const USE_LINES = {
+  personal: '個人で楽しむ目的でのご依頼です',
+  icon: 'SNSのアイコンとして使わせていただきたいです',
+  header: 'SNSのヘッダーとして使わせていただきたいです',
+  post: '完成したイラストをSNSで紹介させていただきたいです',
+  wall: 'スマホの壁紙として使わせていただきたいです',
+  stream: '配信や動画の中で使わせていただきたいです',
+};
+
+/* ---------- 依頼文をつくる ---------- */
+function build(f){
+  const sama = f.creator ? `${f.creator}様` : '';
+  const ask = f.site === 'skeb' ? 'リクエスト' : 'ご依頼';
+  const L = [];
+
+  if (sama) { L.push(sama, ''); }
+  L.push(f.me ? `はじめまして。${f.me}と申します。` : 'はじめまして。');
+  if (f.like) L.push(`${sama || '描き手様'}の${f.like}がとても好きで、ぜひ描いていただきたいと思いました。`);
+  else if (sama) L.push(`${sama}のイラストがとても好きで、ぜひ描いていただきたいと思いました。`);
+  else L.push('いつもイラストを拝見していて、ぜひ描いていただきたいと思いました。');
+
+  const target = f.chara ? `${f.work ? `『${f.work}』の` : ''}${f.chara}のイラスト` : 'イラスト';
+  if (f.site === 'skeb') L.push(`${target}をお願いしたく、リクエストをお送りいたします。`);
+  else if (f.site === 'dm') L.push(`${target}のご依頼について、ご相談させていただきたくご連絡いたしました。`);
+  else L.push(`${target}のご依頼をさせていただきたく、ご連絡いたしました。`);
+
+  const sec = Object.fromEntries(CATS.map(c => [c.id, []]));
+  phrases.forEach(p => { const s = polite(p.text); if (s) sec[p.cat].push(endDot(s)); });
+  f.uses.filter(u => USE_LINES[u]).forEach(u => sec.use.push(USE_LINES[u] + '。'));
+  if (f.uses.includes('credit')) sec.use.push(`使用する際は${sama || '描き手様'}のお名前を記載いたします。`);
+  f.refs.split(/\n/).map(s => s.trim()).filter(Boolean).forEach(u => sec.ref.push(u));
+
+  const bodyCats = CATS.filter(c => sec[c.id].length);
+  if (bodyCats.length) {
+    L.push('', '――――――――――');
+    bodyCats.forEach((c, i) => {
+      L.push(`【${c.label}】`);
+      sec[c.id].forEach(line => L.push('・' + line));
+      if (i < bodyCats.length - 1) L.push('');
+    });
+    L.push('――――――――――');
+  }
+  L.push('');
+
+  const who = sama || '描き手様';
+  if (f.freedom === 'lots') L.push(`上記はあくまで一例ですので、${who}の描きやすいように自由にアレンジしていただけましたら嬉しいです。`);
+  else if (f.freedom === 'strict') L.push('できるだけ上記の内容に沿って描いていただけますと幸いです。');
+  else L.push(`書いていない部分は、${who}におまかせいたします。`);
+
+  if (f.site === 'skeb') {
+    L.push('お忙しいところ恐縮ですが、ご検討いただけますと幸いです。', '完成を心より楽しみにしております。');
+  } else if (f.site === 'dm') {
+    L.push('もしお受けいただける場合は、料金と納期の目安を教えていただけますと幸いです。', 'お忙しいところ恐縮ですが、ご検討のほどよろしくお願いいたします。');
+  } else {
+    L.push('ご不明な点がございましたら、お気軽にお申し付けください。', 'どうぞよろしくお願いいたします。');
+  }
+  return {text: applyTone(L.join('\n'), f.tone), sec};
+}
+
+/* ---------- 画面の更新 ---------- */
+function esc(s){ return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function renderItems(tone){
+  const box = $('#items');
+  if (!phrases.length) { box.innerHTML = '<div class="empty">①に文章を入れると、ここに仕分け結果が出ます</div>'; return; }
+  box.innerHTML = phrases.map((p, i) => {
+    const conv = applyTone(endDot(polite(p.text) || ''), tone);
+    const opts = CATS.map(c => `<option value="${c.id}"${c.id === p.cat ? ' selected' : ''}>${c.emoji} ${c.label}</option>`).join('');
+    return `<div class="item" style="${catStyle(p.cat)}">
+      <div class="head"><select data-i="${i}" aria-label="項目を選び直す">${opts}</select>${overrides[p.text] ? '<span class="moved">（手で選び直しました）</span>' : ''}</div>
+      <div class="orig">元：${esc(p.text)}</div>
+      <div class="conv">→ ${esc(conv)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderChecks(f, sec, text){
+  const C = [];
+  const add = (cls, title, note) => C.push(`<li class="${cls}"><span>${cls === 'ok' ? '✅' : cls === 'warn' ? '⚠️' : '💡'}</span><div><b>${title}</b>${note ? `<span class="t">${note}</span>` : ''}</div></li>`);
+  if (!f.src.trim()) add('warn', '①の文章がまだ空です', '描いてほしい内容を書いてみましょう');
+  f.creator ? add('ok', '描き手さんのお名前が入っています') : add('warn', '描き手さんのお名前がありません', 'お名前を入れると丁寧な印象になります');
+  (f.chara || sec.chara.length) ? add('ok', 'どのキャラを描くか書いてあります') : add('warn', 'どのキャラか分かりにくいかも', 'キャラの名前や見た目の特徴を書きましょう');
+  sec.ref.length ? add('ok', '参考資料があります') : add('warn', '参考画像がありません', 'キャラの見た目がわかる画像のURLがあると、ぐっと伝わりやすくなります');
+  sec.use.length ? add('ok', '使いみちが書いてあります') : add('warn', '使いみちが書いてありません', 'アイコン用・個人で楽しむ用など、③で選んでおくと安心です');
+  sec.ng.length ? add('ok', 'NG（避けてほしいこと）が書いてあります') : add('info', 'NGがあれば書いておきましょう', '苦手な表現などがなければ、そのままでOKです');
+  if (phrases.length > 14) add('warn', `指定が多め（${phrases.length}項目）です`, '細かすぎると受けてもらいにくいことも。大事なものにしぼると◎');
+  if (sec.other.length) add('info', `「その他」に${sec.other.length}つ入っています`, '左の仕分け結果で、ふさわしい項目に選び直せます');
+  if (text.length > 1200) add('info', `${text.length}文字と長めです`, '大事なことが先に来ているか、ざっと見直してみましょう');
+  $('#checks').innerHTML = C.join('');
+}
+
+const TIPS = {
+  skeb: [
+    '<b>Skebは依頼後にやりとりができません。</b>伝えたいことは、この依頼文に全部書いておきましょう',
+    '<b>完成後の修正お願いはできません。</b>「ここだけは守ってほしい」ことは、はっきり書くのがおすすめです',
+    '描き手さんは依頼を<b>お断りすることもあります</b>（その場合は返金されます）。気にしすぎなくて大丈夫です',
+    '描き手さんのプロフィールに<b>「受けられないジャンル」</b>が書かれていないか、送る前に確認しましょう',
+  ],
+  market: [
+    '出品ページの<b>料金・納期・できること</b>を確認してから送りましょう',
+    '修正の回数や、ラフ（下描き）確認があるかを最初に聞いておくと安心です',
+    '描き手さんのプロフィールに<b>「受けられないジャンル」</b>が書かれていないか確認しましょう',
+  ],
+  dm: [
+    'まず<b>依頼を受けつけているか</b>（プロフィールやピン留め投稿）を確認しましょう',
+    '最初の連絡では、料金・納期・支払い方法を相談したい旨を伝えると話が進みやすいです',
+    '返信がなくても催促は控えめに。数日〜1週間ほど待つのがマナーです',
+  ],
+};
+
+function update(){
+  const f = readForm();
+  const parsed = parse(f.src);
+  phrases = parsed.map(p => ({text: p.text, cat: overrides[p.text] || p.cat}));
+  const {text, sec} = build(f);
+  if (!edited) $('#out').value = text;
+  $('#notice').classList.toggle('show', edited);
+  $('#pvName').textContent = f.creator ? `${f.creator}様` : '描き手さん';
+  $('#pvAvatar').textContent = f.creator ? [...f.creator][0] : '？';
+  $('#pvSite').textContent = {skeb:'Skeb', market:'SKIMA・ココナラなど', dm:'DM・メール'}[f.site];
+  renderItems(f.tone);
+  renderChecks(f, sec, $('#out').value);
+  $('#tips').innerHTML = TIPS[f.site].map(t => `<li>${t}</li>`).join('');
+  updateCount();
+  save(f);
+}
+function updateCount(){ $('#count').textContent = `${$('#out').value.replace(/\n/g, '').length}文字`; }
+
+/* ---------- 保存 ---------- */
+const KEY = 'irai-maker-v1';
+function save(f){ try { localStorage.setItem(KEY, JSON.stringify({...f, overrides})); } catch(e) {} }
+function fill(d){
+  ['src','creator','me','chara','work','like','refs'].forEach(k => { $('#' + k).value = d[k] || ''; });
+  $$('#uses input').forEach(i => { i.checked = (d.uses || []).includes(i.value); });
+  [['freedom', d.freedom], ['tone', d.tone], ['site', d.site]].forEach(([g, v]) => {
+    const el = v && $(`#${g} input[value="${v}"]`); if (el) el.checked = true;
+  });
+}
+function load(){
+  try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d) { fill(d); overrides = d.overrides || {}; } } catch(e) {}
+}
+
+/* ---------- イベント ---------- */
+$('#legend').innerHTML = CATS.map(c => `<span class="tag" style="${catStyle(c.id)}">${c.emoji} ${c.label}</span>`).join('');
+document.addEventListener('input', e => {
+  if (e.target.id === 'out') { edited = true; $('#notice').classList.add('show'); updateCount(); return; }
+  if (e.target.closest('.card') && !e.target.closest('#items')) update();
+});
+document.addEventListener('change', e => {
+  if (e.target.matches('#items select')) {
+    const p = phrases[+e.target.dataset.i];
+    overrides[p.text] = e.target.value;
+    update();
+  } else if (e.target.matches('input[type=radio],input[type=checkbox]')) update();
+});
+$('#sample').addEventListener('click', () => {
+  if ($('#src').value.trim() && !confirm('いま入力している内容を、例文で置きかえますか？')) return;
+  overrides = {}; edited = false; fill(SAMPLE); update();
+});
+$('#clear').addEventListener('click', () => {
+  if (!confirm('入力した内容をすべて消しますか？')) return;
+  overrides = {}; edited = false;
+  fill({uses: [], freedom: 'mid', tone: 'polite', site: 'skeb'}); update();
+});
+$('#regen').addEventListener('click', () => {
+  if (edited && !confirm('手で直した内容を捨てて、作り直しますか？')) return;
+  edited = false; update();
+});
+$('#copy').addEventListener('click', async () => {
+  const v = $('#out').value;
+  try { await navigator.clipboard.writeText(v); }
+  catch(e) { $('#out').select(); document.execCommand('copy'); }
+  const t = $('#toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1600);
+});
+
+['#copy2','#barCopy'].forEach(s => $(s).addEventListener('click', () => $('#copy').click()));
+
+load();
+update();
+</script>
+</body>
+</html>
